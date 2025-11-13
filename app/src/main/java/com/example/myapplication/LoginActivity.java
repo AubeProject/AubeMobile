@@ -3,7 +3,7 @@ package com.example.myapplication;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
-import android.view.View;
+import android.util.Patterns;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -13,9 +13,6 @@ import androidx.appcompat.app.AppCompatActivity;
 
 public class LoginActivity extends AppCompatActivity {
 
-    private EditText emailEt, passwordEt;
-    private Button loginBtn;
-    private TextView registerTv;
     private DatabaseHelper db;
 
     @Override
@@ -25,16 +22,39 @@ public class LoginActivity extends AppCompatActivity {
 
         db = new DatabaseHelper(this);
 
-        emailEt = findViewById(R.id.etEmail);
-        passwordEt = findViewById(R.id.etPassword);
-        loginBtn = findViewById(R.id.btnLogin);
-        registerTv = findViewById(R.id.tvRegister);
+        EditText emailEt = findViewById(R.id.etEmail);
+        EditText passwordEt = findViewById(R.id.etPassword);
+        Button loginBtn = findViewById(R.id.btnLogin);
+        TextView registerTv = findViewById(R.id.tvRegister);
 
         loginBtn.setOnClickListener(v -> {
             String email = emailEt.getText().toString().trim();
             String password = passwordEt.getText().toString().trim();
-            if (TextUtils.isEmpty(email) || TextUtils.isEmpty(password)) {
-                Toast.makeText(LoginActivity.this, "Preencha email e senha", Toast.LENGTH_SHORT).show();
+
+            // Validação: campos obrigatórios
+            if (TextUtils.isEmpty(email)) {
+                emailEt.setError("Preencha o e-mail");
+                emailEt.requestFocus();
+                return;
+            }
+
+            // Validação: formato de e-mail
+            if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+                emailEt.setError("Formato de e-mail inválido");
+                emailEt.requestFocus();
+                return;
+            }
+
+            if (TextUtils.isEmpty(password)) {
+                passwordEt.setError("Preencha a senha");
+                passwordEt.requestFocus();
+                return;
+            }
+
+            // Validação: comprimento mínimo da senha
+            if (password.length() < 7) {
+                passwordEt.setError("A senha deve ter ao menos 7 caracteres");
+                passwordEt.requestFocus();
                 return;
             }
 
@@ -55,4 +75,3 @@ public class LoginActivity extends AppCompatActivity {
         });
     }
 }
-

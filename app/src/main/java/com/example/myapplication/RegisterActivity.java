@@ -3,6 +3,7 @@ package com.example.myapplication;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Patterns;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -12,8 +13,6 @@ import androidx.appcompat.app.AppCompatActivity;
 
 public class RegisterActivity extends AppCompatActivity {
 
-    private EditText emailEt, passwordEt;
-    private Button registerBtn;
     private DatabaseHelper db;
 
     @Override
@@ -23,16 +22,36 @@ public class RegisterActivity extends AppCompatActivity {
 
         db = new DatabaseHelper(this);
 
-        emailEt = findViewById(R.id.etEmail);
-        passwordEt = findViewById(R.id.etPassword);
-        registerBtn = findViewById(R.id.btnRegister);
+        EditText emailEt = findViewById(R.id.etEmail);
+        EditText passwordEt = findViewById(R.id.etPassword);
+        Button registerBtn = findViewById(R.id.btnRegister);
         TextView backTv = findViewById(R.id.tvBackLogin);
 
         registerBtn.setOnClickListener(v -> {
             String email = emailEt.getText().toString().trim();
             String password = passwordEt.getText().toString().trim();
-            if (TextUtils.isEmpty(email) || TextUtils.isEmpty(password)) {
-                Toast.makeText(RegisterActivity.this, "Preencha email e senha", Toast.LENGTH_SHORT).show();
+
+            if (TextUtils.isEmpty(email)) {
+                emailEt.setError("Preencha o e-mail");
+                emailEt.requestFocus();
+                return;
+            }
+
+            if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+                emailEt.setError("Formato de e-mail inválido");
+                emailEt.requestFocus();
+                return;
+            }
+
+            if (TextUtils.isEmpty(password)) {
+                passwordEt.setError("Preencha a senha");
+                passwordEt.requestFocus();
+                return;
+            }
+
+            if (password.length() < 7) {
+                passwordEt.setError("A senha deve ter ao menos 7 caracteres");
+                passwordEt.requestFocus();
                 return;
             }
 
