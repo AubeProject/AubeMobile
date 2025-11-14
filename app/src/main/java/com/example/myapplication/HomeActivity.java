@@ -19,26 +19,28 @@ public class HomeActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
 
-        RecyclerView rv = findViewById(R.id.rvBottomCarousel);
+        // Configura barra inferior deslizável
+        RecyclerView bottomNav = findViewById(R.id.bottomNav);
         LinearLayoutManager lm = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
-        rv.setLayoutManager(lm);
-        rv.setItemViewCacheSize(5);
+        bottomNav.setLayoutManager(lm);
+        bottomNav.setItemViewCacheSize(6);
 
         List<BottomItem> items = new ArrayList<>();
+        items.add(new BottomItem("Dashboard", R.drawable.ic_dashboard));
         items.add(new BottomItem("Catálogo", R.drawable.ic_cup_straw));
         items.add(new BottomItem("Clientes", R.drawable.ic_person));
         items.add(new BottomItem("Pedidos", R.drawable.ic_cart));
         items.add(new BottomItem("Rotas", R.drawable.ic_map));
 
         BottomCarouselAdapter adapter = new BottomCarouselAdapter(items, (pos, item) -> {
-            // TODO: navegação
+            // TODO: ação ao clicar em cada item do bottom menu
         });
-        rv.setAdapter(adapter);
+        bottomNav.setAdapter(adapter);
 
         LinearSnapHelper snapHelper = new LinearSnapHelper();
-        snapHelper.attachToRecyclerView(rv);
+        snapHelper.attachToRecyclerView(bottomNav);
 
-        rv.addOnScrollListener(new RecyclerView.OnScrollListener() {
+        bottomNav.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
                 super.onScrollStateChanged(recyclerView, newState);
@@ -53,6 +55,6 @@ public class HomeActivity extends AppCompatActivity {
         });
 
         adapter.setSelectedPosition(0);
-        rv.scrollToPosition(0);
+        bottomNav.scrollToPosition(0);
     }
 }

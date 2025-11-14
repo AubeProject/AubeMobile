@@ -30,7 +30,7 @@
         android:id="@+id/ivWine"
         android:layout_width="48dp"
         android:layout_height="48dp"
-        android:src="@drawable/taca_de_vinho"
+        android:src="@drawable/vinho"
         android:contentDescription="@string/wine_icon_desc"
         app:layout_constraintTop_toTopOf="parent"
         android:layout_marginTop="32dp"
