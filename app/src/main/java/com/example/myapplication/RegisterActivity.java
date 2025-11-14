@@ -11,16 +11,18 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.myapplication.data.repository.UserRepository;
+
 public class RegisterActivity extends AppCompatActivity {
 
-    private DatabaseHelper db;
+    private UserRepository userRepository;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
 
-        db = new DatabaseHelper(this);
+        userRepository = new UserRepository(this);
 
         EditText emailEt = findViewById(R.id.etEmail);
         EditText passwordEt = findViewById(R.id.etPassword);
@@ -55,15 +57,14 @@ public class RegisterActivity extends AppCompatActivity {
                 return;
             }
 
-            if (db.checkUserExists(email)) {
+            if (userRepository.exists(email)) {
                 Toast.makeText(RegisterActivity.this, "Usuário já existe", Toast.LENGTH_SHORT).show();
                 return;
             }
 
-            boolean added = db.addUser(email, password);
+            boolean added = userRepository.register(email, password);
             if (added) {
                 Toast.makeText(RegisterActivity.this, "Registro criado com sucesso", Toast.LENGTH_SHORT).show();
-                // volta para login
                 Intent i = new Intent(RegisterActivity.this, LoginActivity.class);
                 i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
                 startActivity(i);
@@ -74,7 +75,6 @@ public class RegisterActivity extends AppCompatActivity {
         });
 
         backTv.setOnClickListener(v -> {
-            // apenas fecha a activity para voltar ao LoginActivity
             finish();
         });
     }

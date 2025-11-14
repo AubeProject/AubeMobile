@@ -11,16 +11,18 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.myapplication.data.repository.UserRepository;
+
 public class LoginActivity extends AppCompatActivity {
 
-    private DatabaseHelper db;
+    private UserRepository userRepository;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
-        db = new DatabaseHelper(this);
+        userRepository = new UserRepository(this);
 
         EditText emailEt = findViewById(R.id.etEmail);
         EditText passwordEt = findViewById(R.id.etPassword);
@@ -58,7 +60,7 @@ public class LoginActivity extends AppCompatActivity {
                 return;
             }
 
-            if (db.checkUser(email, password)) {
+            if (userRepository.authenticate(email, password)) {
                 // login successful
                 Intent i = new Intent(LoginActivity.this, HomeActivity.class);
                 i.putExtra("email", email);

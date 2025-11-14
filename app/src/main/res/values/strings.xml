@@ -18,4 +18,36 @@
 
     <string name="footer">© 2025 Aube. Todos os direitos reservados.</string>
     <string name="wine_icon_desc">Ícone de taça</string>
+    <string name="welcome_user">Bem-vindo, %1$s</string>
+    <string name="carousel_default_icon">D</string>
+    <string name="carousel_label">Label</string>
+
+    <!-- Dashboard strings -->
+    <string name="dashboard_title">Dashboard</string>
+    <string name="dashboard_subtitle">Representante Comercial</string>
+    <string name="period_week">Semana</string>
+    <string name="period_month">Mês</string>
+    <string name="period_year">Ano</string>
+    <string name="total_vendido">Total Vendido</string>
+    <string name="clientes_visitados">Clientes Visitados</string>
+    <string name="pedidos_fechados">Pedidos Fechados</string>
+    <string name="comissoes">Comissões</string>
+    <string name="vendas_ultimos_meses">Vendas nos Últimos Meses</string>
+    <string name="delta_mes_anterior">+18.2% vs mês anterior</string>
+    <string name="clientes_semana">+5 esta semana</string>
+    <string name="pendentes">12 pendentes</string>
+    <string name="percent_comissoes">5% sobre vendas</string>
+    <string name="valor_total">R$ 94.500</string>
+    <string name="valor_clientes">28</string>
+    <string name="valor_pedidos">42</string>
+    <string name="valor_comissoes">R$ 4.725</string>
+
+    <!-- Bottom nav -->
+    <string name="nav_dashboard">Dashboard</string>
+    <string name="nav_catalogo">Catálogo</string>
+    <string name="nav_clientes">Clientes</string>
+    <string name="nav_pedidos">Pedidos</string>
+    <string name="nav_rotas">Rotas</string>
+
+    <string name="avatar_icon"></string>
 </resources>
