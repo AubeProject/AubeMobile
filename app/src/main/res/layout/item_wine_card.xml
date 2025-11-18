@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="8dp"
+    app:cardCornerRadius="12dp"
+    app:cardUseCompatPadding="true"
+    app:cardBackgroundColor="#1A1A1A">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="10dp">
+
+        <ImageView
+            android:id="@+id/ivWine"
+            android:layout_width="match_parent"
+            android:layout_height="120dp"
+            android:scaleType="centerCrop"
+            android:src="@drawable/vinho"
+            android:background="@android:color/transparent" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="6dp">
+
+            <TextView
+                android:id="@+id/tvWineType"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Tinto"
+                android:textColor="#FFFFFF"
+                android:background="@drawable/edit_text_bg"
+                android:paddingLeft="6dp"
+                android:paddingRight="6dp"
+                android:paddingTop="2dp"
+                android:paddingBottom="2dp"/>
+
+            <TextView
+                android:id="@+id/tvWineYear"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Safra 2018"
+                android:textColor="#BDBDBD"
+                android:textSize="12sp"
+                android:layout_marginStart="6dp"/>
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/tvWineName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Reserva Gran Vinho Tinto"
+            android:textColor="#FFFFFF"
+            android:textStyle="bold"
+            android:textSize="14sp"
+            android:layout_marginTop="2dp"/>
+
+        <TextView
+            android:id="@+id/tvWinePrice"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="R$ 189,90"
+            android:textColor="#FF9800"
+            android:textStyle="bold"
+            android:textSize="13sp"
+            android:layout_marginTop="2dp"/>
+
+    </LinearLayout>
+</androidx.cardview.widget.CardView>

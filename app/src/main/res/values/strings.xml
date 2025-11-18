@@ -50,4 +50,41 @@
     <string name="nav_rotas">Rotas</string>
 
     <string name="avatar_icon"></string>
+
+    <!-- Catalog strings -->
+    <string name="catalog_header_title">AUBE</string>
+    <string name="catalog_header_subtitle">Catálogo de Vinhos</string>
+    <string name="catalog_search_hint">Buscar vinhos...</string>
+    <string name="catalog_all_types">Todos os tipos</string>
+    <string name="type_tinto">Tinto</string>
+    <string name="type_branco">Branco</string>
+    <string name="type_rose">Rosé</string>
+    <string name="type_espumante">Espumante</string>
+
+    <!-- Dialog strings -->
+    <string name="dialog_image_label">Imagem do Produto</string>
+    <string name="dialog_image_hint">Clique para fazer upload\nPNG, JPG até 5MB</string>
+    <string name="dialog_name_label">Nome do Vinho</string>
+    <string name="dialog_name_hint">Ex: Reserva Gran Vinho Tinto</string>
+    <string name="dialog_type_label">Tipo</string>
+    <string name="dialog_year_label">Safra (Ano)</string>
+    <string name="dialog_year_hint">Ex: 2018</string>
+    <string name="dialog_price_label">Preço</string>
+    <string name="dialog_price_hint">Ex: R$ 189,90</string>
+    <string name="dialog_notes_label">Notas de Degustação</string>
+    <string name="dialog_notes_hint">Descreva os aromas, sabores e características do vinho...</string>
+    <string name="dialog_pairing_label">Harmonização</string>
+    <string name="dialog_pairing_hint">Sugira pratos e alimentos que harmonizam com este vinho...</string>
+    <string name="dialog_save">Salvar Produto</string>
+    <string name="dialog_cancel">Cancelar</string>
+    <string name="dialog_title_add_wine">Cadastrar Vinho</string>
+    <string name="content_desc_upload_icon">Ícone de upload</string>
+
+    <!-- Wine details strings -->
+    <string name="back">Voltar</string>
+    <string name="wine_details_title">Detalhes do Vinho</string>
+    <string name="wine_image">Imagem do vinho</string>
+    <string name="em_dash">—</string>
+    <string name="label_pairing_suggested">Harmonização Sugerida</string>
+    <string name="add_to_order">Adicionar ao Pedido</string>
 </resources>
