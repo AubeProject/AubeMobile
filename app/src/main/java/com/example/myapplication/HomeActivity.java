@@ -1,5 +1,6 @@
 package com.example.myapplication;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 
@@ -33,7 +34,21 @@ public class HomeActivity extends AppCompatActivity {
         items.add(new BottomItem("Rotas", R.drawable.ic_map));
 
         BottomCarouselAdapter adapter = new BottomCarouselAdapter(items, (pos, item) -> {
-            // TODO: ação ao clicar em cada item do bottom menu
+            Intent intent = null;
+            String title = item.getTitle();
+            if ("Dashboard".equals(title)) {
+                intent = new Intent(this, HomeActivity.class)
+                        .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+            } else if ("Catálogo".equals(title)) {
+                intent = new Intent(this, CatalogActivity.class);
+            } else if ("Clientes".equals(title)) {
+                intent = new Intent(this, ClientsActivity.class);
+            } else if ("Pedidos".equals(title)) {
+                intent = new Intent(this, OrdersActivity.class);
+            } else if ("Rotas".equals(title)) {
+                intent = new Intent(this, RoutesActivity.class);
+            }
+            if (intent != null) startActivity(intent);
         });
         bottomNav.setAdapter(adapter);
 
