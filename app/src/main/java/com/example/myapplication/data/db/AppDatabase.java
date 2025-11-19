@@ -6,7 +6,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 public class AppDatabase extends SQLiteOpenHelper {
     public static final String DATABASE_NAME = "app.db";
-    public static final int DATABASE_VERSION = 2; // bumped due to wines table
+    public static final int DATABASE_VERSION = 3; // bumped due to quantity column
 
     // User table
     public static final String TABLE_USERS = "users";
@@ -24,6 +24,7 @@ public class AppDatabase extends SQLiteOpenHelper {
     public static final String COL_WINE_NOTES = "notes"; // notas de degustação
     public static final String COL_WINE_PAIRING = "pairing"; // harmonização
     public static final String COL_WINE_IMAGE_URI = "image_uri"; // URI da imagem no device
+    public static final String COL_WINE_QUANTITY = "quantity";
 
     private static volatile AppDatabase INSTANCE; // singleton
 
@@ -59,25 +60,16 @@ public class AppDatabase extends SQLiteOpenHelper {
                 COL_WINE_PRICE + " REAL, " +
                 COL_WINE_NOTES + " TEXT, " +
                 COL_WINE_PAIRING + " TEXT, " +
-                COL_WINE_IMAGE_URI + " TEXT" +
+                COL_WINE_IMAGE_URI + " TEXT, " +
+                COL_WINE_QUANTITY + " INTEGER DEFAULT 0" +
                 ");";
         db.execSQL(CREATE_WINES);
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        if (oldVersion < 2) {
-            String CREATE_WINES = "CREATE TABLE IF NOT EXISTS " + TABLE_WINES + " (" +
-                    COL_WINE_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                    COL_WINE_NAME + " TEXT NOT NULL, " +
-                    COL_WINE_TYPE + " TEXT, " +
-                    COL_WINE_YEAR + " INTEGER, " +
-                    COL_WINE_PRICE + " REAL, " +
-                    COL_WINE_NOTES + " TEXT, " +
-                    COL_WINE_PAIRING + " TEXT, " +
-                    COL_WINE_IMAGE_URI + " TEXT" +
-                    ");";
-            db.execSQL(CREATE_WINES);
+        if (oldVersion < 3) {
+            db.execSQL("ALTER TABLE " + TABLE_WINES + " ADD COLUMN " + COL_WINE_QUANTITY + " INTEGER DEFAULT 0;");
         }
     }
 }

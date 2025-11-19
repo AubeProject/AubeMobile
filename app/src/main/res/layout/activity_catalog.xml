@@ -20,7 +20,7 @@
             android:layout_width="24dp"
             android:layout_height="24dp"
             android:src="@drawable/ic_cup_straw"
-            android:tint="#F57C00"
+            app:tint="#F57C00"
             android:contentDescription="@null"/>
         <LinearLayout
             android:layout_width="wrap_content"
@@ -50,7 +50,7 @@
             android:layout_width="24dp"
             android:layout_height="24dp"
             android:src="@drawable/ic_dashboard"
-            android:tint="#FFFFFF"
+            app:tint="#FFFFFF"
             android:contentDescription="@null"/>
     </LinearLayout>
 
@@ -68,6 +68,8 @@
         android:textColor="#FFFFFF"
         android:textColorHint="#AAAAAA"
         android:background="@drawable/edit_text_bg"
+        android:inputType="text"
+        android:autofillHints="search"
         app:layout_constraintTop_toBottomOf="@id/topBar"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"/>
@@ -104,7 +106,7 @@
             android:layout_width="20dp"
             android:layout_height="20dp"
             android:src="@drawable/ic_filter_circle"
-            android:tint="#FFFFFF"
+            app:tint="#FFFFFF"
             android:layout_marginStart="8dp"
             android:contentDescription="@null"/>
     </LinearLayout>
@@ -129,7 +131,8 @@
         android:backgroundTint="#F57C00"
         android:background="@drawable/edit_text_bg"
         android:src="@drawable/ic_add"
-        android:tint="#FFFFFF"
+        app:tint="#FFFFFF"
+        android:contentDescription="@string/add_wine_button_desc"
         app:layout_constraintBottom_toTopOf="@id/bottomNav"
         app:layout_constraintEnd_toEndOf="parent"/>
 

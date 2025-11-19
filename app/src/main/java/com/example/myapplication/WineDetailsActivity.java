@@ -1,7 +1,11 @@
 package com.example.myapplication;
 
+import android.app.AlertDialog;
 import android.net.Uri;
 import android.os.Bundle;
+import android.text.InputType;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -37,6 +41,8 @@ public class WineDetailsActivity extends AppCompatActivity {
         TextView tvPrice = findViewById(R.id.tvPrice);
         TextView tvNotes = findViewById(R.id.tvNotes);
         TextView tvPairing = findViewById(R.id.tvPairing);
+        TextView tvQuantity = findViewById(R.id.tvQuantity);
+        Button btnEditQuantity = findViewById(R.id.btnEditQuantity);
 
         if (wine.getImageUri() != null) {
             try { ivHero.setImageURI(Uri.parse(wine.getImageUri())); } catch (Exception ignore) {}
@@ -49,6 +55,26 @@ public class WineDetailsActivity extends AppCompatActivity {
         tvPrice.setText(wine.getPrice() != null ? String.format(Locale.getDefault(), "R$ %.2f", wine.getPrice()) : "");
         tvNotes.setText(wine.getNotes() != null ? wine.getNotes() : getString(R.string.em_dash));
         tvPairing.setText(wine.getPairing() != null ? wine.getPairing() : getString(R.string.em_dash));
+        tvQuantity.setText(String.valueOf(wine.getQuantity() != null ? wine.getQuantity() : 0));
+
+        btnEditQuantity.setOnClickListener(v -> {
+            final EditText input = new EditText(this);
+            input.setInputType(InputType.TYPE_CLASS_NUMBER);
+            input.setText(String.valueOf(wine.getQuantity() != null ? wine.getQuantity() : 0));
+            new AlertDialog.Builder(this)
+                .setTitle("Editar quantidade em estoque")
+                .setView(input)
+                .setPositiveButton("Salvar", (dialog, which) -> {
+                    int newQuantity = 0;
+                    try { newQuantity = Integer.parseInt(input.getText().toString()); } catch (Exception ignore) {}
+                    wine.setQuantity(newQuantity);
+                    tvQuantity.setText(String.valueOf(newQuantity));
+                    WineRepository repo1 = new WineRepository(this);
+                    repo1.update(wine);
+                })
+                .setNegativeButton("Cancelar", null)
+                .show();
+        });
 
         findViewById(R.id.btnAddToOrder).setOnClickListener(v -> {
             v.setEnabled(false);

@@ -87,4 +87,11 @@
     <string name="em_dash">—</string>
     <string name="label_pairing_suggested">Harmonização Sugerida</string>
     <string name="add_to_order">Adicionar ao Pedido</string>
+    <string name="label_quantity">Quantidade em estoque</string>
+    <string name="edit_quantity">Editar</string>
+    <string name="dialog_quantity_hint">Quantidade em estoque</string>
+    <string name="edit_quantity_title">Editar quantidade em estoque</string>
+    <string name="save">Salvar</string>
+    <string name="cancel">Cancelar</string>
+    <string name="add_wine_button_desc">Adicionar vinho"</string>
 </resources>

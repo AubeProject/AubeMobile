@@ -73,6 +73,7 @@ public class WineDaoImpl implements WineDao {
         v.put(AppDatabase.COL_WINE_NOTES, w.getNotes());
         v.put(AppDatabase.COL_WINE_PAIRING, w.getPairing());
         v.put(AppDatabase.COL_WINE_IMAGE_URI, w.getImageUri());
+        if (w.getQuantity() != null) v.put(AppDatabase.COL_WINE_QUANTITY, w.getQuantity()); else v.putNull(AppDatabase.COL_WINE_QUANTITY);
         return v;
     }
 
@@ -86,7 +87,7 @@ public class WineDaoImpl implements WineDao {
         w.setNotes(c.getString(c.getColumnIndexOrThrow(AppDatabase.COL_WINE_NOTES)));
         w.setPairing(c.getString(c.getColumnIndexOrThrow(AppDatabase.COL_WINE_PAIRING)));
         w.setImageUri(c.getString(c.getColumnIndexOrThrow(AppDatabase.COL_WINE_IMAGE_URI)));
+        if (!c.isNull(c.getColumnIndexOrThrow(AppDatabase.COL_WINE_QUANTITY))) w.setQuantity(c.getInt(c.getColumnIndexOrThrow(AppDatabase.COL_WINE_QUANTITY)));
         return w;
     }
 }
-

@@ -151,6 +151,7 @@ public class CatalogActivity extends AppCompatActivity {
         EditText etPrice = form.findViewById(R.id.etPrice);
         EditText etNotes = form.findViewById(R.id.etNotes);
         EditText etPairing = form.findViewById(R.id.etPairing);
+        EditText etQuantity = form.findViewById(R.id.etQuantity);
         View pickArea = form.findViewById(R.id.pickImageArea);
         pendingPreview = form.findViewById(R.id.ivPreview);
 
@@ -170,9 +171,10 @@ public class CatalogActivity extends AppCompatActivity {
                     String notes = etNotes.getText().toString();
                     String pairing = etPairing.getText().toString();
                     String image = pendingImageUri != null ? pendingImageUri.toString() : null;
+                    Integer quantity = etQuantity.getText().length() > 0 ? Integer.valueOf(etQuantity.getText().toString()) : 0;
 
                     if (name.isEmpty()) return; // minimal validation
-                    Wine wine = new Wine(null, name, type, year, price, notes, pairing, image);
+                    Wine wine = new Wine(null, name, type, year, price, notes, pairing, image, quantity);
                     repo.add(wine);
                     refreshList();
                     pendingImageUri = null;
@@ -247,7 +249,7 @@ public class CatalogActivity extends AppCompatActivity {
             ((TextView) h.itemView.findViewById(R.id.tvWineType)).setText(w.getType() != null ? w.getType() : "");
             ((TextView) h.itemView.findViewById(R.id.tvWineYear)).setText(w.getYear() != null ? "Safra " + w.getYear() : "");
             ((TextView) h.itemView.findViewById(R.id.tvWinePrice)).setText(w.getPrice() != null ? String.format("R$ %.2f", w.getPrice()) : "");
-
+            ((TextView) h.itemView.findViewById(R.id.tvWineQuantity)).setText("Estoque: " + (w.getQuantity() != null ? w.getQuantity() : 0));
             h.itemView.setOnClickListener(v -> {
                 Context ctx = v.getContext();
                 Intent it = new Intent(ctx, WineDetailsActivity.class);

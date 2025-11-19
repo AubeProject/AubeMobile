@@ -9,10 +9,11 @@ public class Wine {
     private String notes;
     private String pairing;
     private String imageUri;
+    private Integer quantity;
 
     public Wine() {}
 
-    public Wine(Long id, String name, String type, Integer year, Double price, String notes, String pairing, String imageUri) {
+    public Wine(Long id, String name, String type, Integer year, Double price, String notes, String pairing, String imageUri, Integer quantity) {
         this.id = id;
         this.name = name;
         this.type = type;
@@ -21,6 +22,7 @@ public class Wine {
         this.notes = notes;
         this.pairing = pairing;
         this.imageUri = imageUri;
+        this.quantity = quantity;
     }
 
     // getters and setters
@@ -40,5 +42,6 @@ public class Wine {
     public void setPairing(String pairing) { this.pairing = pairing; }
     public String getImageUri() { return imageUri; }
     public void setImageUri(String imageUri) { this.imageUri = imageUri; }
+    public Integer getQuantity() { return quantity; }
+    public void setQuantity(Integer quantity) { this.quantity = quantity; }
 }
-

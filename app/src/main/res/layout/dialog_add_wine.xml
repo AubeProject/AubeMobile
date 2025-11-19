@@ -189,5 +189,25 @@
             android:inputType="textMultiLine"
             android:autofillHints="pairing"/>
 
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Quantidade em estoque"
+            android:textColor="#2B2B2B"
+            android:textStyle="bold"
+            android:layout_marginTop="12dp"/>
+        <EditText
+            android:id="@+id/etQuantity"
+            android:layout_width="match_parent"
+            android:layout_height="44dp"
+            android:background="@drawable/bg_dialog_field"
+            android:inputType="number"
+            android:paddingStart="14dp"
+            android:paddingEnd="14dp"
+            android:textColor="#2B2B2B"
+            android:textColorHint="#9E9E9E"
+            android:hint="Quantidade em estoque"
+            android:autofillHints="quantity"/>
+
     </LinearLayout>
 </ScrollView>
