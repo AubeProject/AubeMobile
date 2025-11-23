@@ -93,5 +93,28 @@
     <string name="edit_quantity_title">Editar quantidade em estoque</string>
     <string name="save">Salvar</string>
     <string name="cancel">Cancelar</string>
-    <string name="add_wine_button_desc">Adicionar vinho"</string>
+    <string name="add_wine_button_desc">Adicionar vinho</string>
+
+    <!-- Clients strings -->
+    <string name="clients_header_title">Gestão de Clientes</string>
+    <string name="clients_header_subtitle">Clientes cadastrados</string>
+    <string name="clients_search_hint">Buscar clientes...</string>
+    <string name="add_client_button_desc">Adicionar cliente</string>
+    <string name="new_client_title">Novo Cliente</string>
+    <string name="clients_label_name">Nome/Razão Social</string>
+    <string name="clients_hint_name">Ex: Restaurante Villa Toscana</string>
+    <string name="clients_label_document">CNPJ/CPF</string>
+    <string name="clients_hint_document">00.000.000/0000-00</string>
+    <string name="clients_label_address">Endereço</string>
+    <string name="clients_hint_address">Rua, número, bairro</string>
+    <string name="clients_label_responsible">Responsável</string>
+    <string name="clients_hint_responsible">Nome do responsável</string>
+    <string name="clients_label_phone">Telefone</string>
+    <string name="clients_hint_phone">(00) 00000-0000</string>
+    <string name="action_edit">Editar</string>
+    <string name="action_delete">Apagar</string>
+    <string name="edit_client_title">Editar Cliente</string>
+    <string name="delete_client_title">Apagar Cliente</string>
+    <string name="delete_client_confirm">Deseja apagar %1$s?</string>
+    <string name="dialog_delete">Apagar</string>
 </resources>

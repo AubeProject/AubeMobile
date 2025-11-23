@@ -6,7 +6,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 public class AppDatabase extends SQLiteOpenHelper {
     public static final String DATABASE_NAME = "app.db";
-    public static final int DATABASE_VERSION = 3; // bumped due to quantity column
+    public static final int DATABASE_VERSION = 4; // bump for clients table
 
     // User table
     public static final String TABLE_USERS = "users";
@@ -25,6 +25,15 @@ public class AppDatabase extends SQLiteOpenHelper {
     public static final String COL_WINE_PAIRING = "pairing"; // harmonização
     public static final String COL_WINE_IMAGE_URI = "image_uri"; // URI da imagem no device
     public static final String COL_WINE_QUANTITY = "quantity";
+
+    // Clients table
+    public static final String TABLE_CLIENTS = "clients";
+    public static final String COL_CLIENT_ID = "id";
+    public static final String COL_CLIENT_NAME = "name";        // nome/razão
+    public static final String COL_CLIENT_DOCUMENT = "document"; // cpf/cnpj
+    public static final String COL_CLIENT_ADDRESS = "address";   // endereço/localização
+    public static final String COL_CLIENT_RESPONSIBLE = "responsible"; // responsável
+    public static final String COL_CLIENT_PHONE = "phone";       // telefone
 
     private static volatile AppDatabase INSTANCE; // singleton
 
@@ -64,12 +73,33 @@ public class AppDatabase extends SQLiteOpenHelper {
                 COL_WINE_QUANTITY + " INTEGER DEFAULT 0" +
                 ");";
         db.execSQL(CREATE_WINES);
+
+        String CREATE_CLIENTS = "CREATE TABLE IF NOT EXISTS " + TABLE_CLIENTS + " (" +
+                COL_CLIENT_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                COL_CLIENT_NAME + " TEXT NOT NULL, " +
+                COL_CLIENT_DOCUMENT + " TEXT, " +
+                COL_CLIENT_ADDRESS + " TEXT, " +
+                COL_CLIENT_RESPONSIBLE + " TEXT, " +
+                COL_CLIENT_PHONE + " TEXT" +
+                ");";
+        db.execSQL(CREATE_CLIENTS);
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         if (oldVersion < 3) {
             db.execSQL("ALTER TABLE " + TABLE_WINES + " ADD COLUMN " + COL_WINE_QUANTITY + " INTEGER DEFAULT 0;");
+        }
+        if (oldVersion < 4) {
+            String CREATE_CLIENTS = "CREATE TABLE IF NOT EXISTS " + TABLE_CLIENTS + " (" +
+                    COL_CLIENT_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                    COL_CLIENT_NAME + " TEXT NOT NULL, " +
+                    COL_CLIENT_DOCUMENT + " TEXT, " +
+                    COL_CLIENT_ADDRESS + " TEXT, " +
+                    COL_CLIENT_RESPONSIBLE + " TEXT, " +
+                    COL_CLIENT_PHONE + " TEXT" +
+                    ");";
+            db.execSQL(CREATE_CLIENTS);
         }
     }
 }
