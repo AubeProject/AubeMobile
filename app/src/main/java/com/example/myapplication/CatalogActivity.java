@@ -7,6 +7,7 @@ import android.graphics.Rect;
 import android.net.Uri;
 import android.os.Bundle;
 import android.text.Editable;
+import android.text.InputFilter;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,6 +19,7 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
@@ -32,9 +34,11 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.myapplication.data.model.Wine;
 import com.example.myapplication.data.repository.WineRepository;
 import com.example.myapplication.R;
+import com.example.myapplication.util.PriceInputMask;
 
 import java.util.ArrayList;
 import java.util.List;
+import android.text.Spanned; // import added for InputFilter filter signature
 
 public class CatalogActivity extends AppCompatActivity {
     private WineRepository repo;
@@ -159,33 +163,82 @@ public class CatalogActivity extends AppCompatActivity {
         String[] types = new String[]{"Tinto", "Branco", "Rosé", "Espumante"};
         spType.setAdapter(new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, types));
 
+        // Máscara de preço
+        PriceInputMask priceMask = new PriceInputMask(etPrice);
+        etPrice.addTextChangedListener(priceMask);
+
+        // Filtro de ano para apenas 4 dígitos válidos > 1900
+        etYear.setFilters(new InputFilter[]{new InputFilter.LengthFilter(4), new InputFilter() {
+            @Override public CharSequence filter(CharSequence source, int start, int end, Spanned dest, int dstart, int dend) {
+                // Apenas dígitos
+                for (int i = start; i < end; i++) {
+                    if (!Character.isDigit(source.charAt(i))) return ""; }
+                return null; }
+        }});
+
+        // Filtro de quantidade para max 6 dígitos
+        etQuantity.setFilters(new InputFilter[]{new InputFilter.LengthFilter(6), new InputFilter() {
+            @Override public CharSequence filter(CharSequence source, int start, int end, Spanned dest, int dstart, int dend) {
+                for (int i = start; i < end; i++) if (!Character.isDigit(source.charAt(i))) return ""; return null; }
+        }});
+
+        // Limite de tamanho em nome
+        etName.setFilters(new InputFilter[]{new InputFilter.LengthFilter(60)});
+
         pickArea.setOnClickListener(v -> pickImageLauncher.launch(new String[]{"image/*"}));
 
-        new AlertDialog.Builder(this)
+        AlertDialog dialog = new AlertDialog.Builder(this)
                 .setTitle(R.string.dialog_title_add_wine)
                 .setView(form)
-                .setPositiveButton(R.string.dialog_save, (d, w) -> {
-                    String name = etName.getText().toString().trim();
-                    String type = spType.getSelectedItem() != null ? spType.getSelectedItem().toString() : null;
-                    Integer year = etYear.getText().length() > 0 ? Integer.valueOf(etYear.getText().toString()) : null;
-                    Double price = etPrice.getText().length() > 0 ? Double.valueOf(etPrice.getText().toString().replace(",", ".")) : null;
-                    String notes = etNotes.getText().toString();
-                    String pairing = etPairing.getText().toString();
-                    String image = pendingImageUri != null ? pendingImageUri.toString() : null;
-                    Integer quantity = etQuantity.getText().length() > 0 ? Integer.valueOf(etQuantity.getText().toString()) : 0;
-
-                    if (name.isEmpty()) return; // minimal validation
-                    Wine wine = new Wine(null, name, type, year, price, notes, pairing, image, quantity);
-                    repo.add(wine);
-                    refreshList();
-                    pendingImageUri = null;
-                    pendingPreview = null;
-                })
+                .setPositiveButton(R.string.dialog_save, null) // Anular para validar manualmente
                 .setNegativeButton(R.string.dialog_cancel, (d, which) -> {
                     pendingImageUri = null;
                     pendingPreview = null;
                 })
-                .show();
+                .create();
+
+        dialog.setOnShowListener(dlg -> {
+            dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(btn -> {
+                // Validações
+                boolean ok = true;
+                String name = etName.getText().toString().trim();
+                if (name.isEmpty()) { etName.setError(getString(R.string.error_required)); ok = false; }
+                else if (name.length() < 3) { etName.setError(getString(R.string.error_min_length_name)); ok = false; }
+
+                String type = spType.getSelectedItem() != null ? spType.getSelectedItem().toString() : null;
+                if (type == null) { Toast.makeText(this, R.string.error_type_required, Toast.LENGTH_SHORT).show(); ok = false; }
+
+                Integer year = null;
+                if (etYear.getText().length() > 0) {
+                    try { int y = Integer.parseInt(etYear.getText().toString()); if (y < 1900 || y > 2100) { etYear.setError(getString(R.string.error_invalid_year)); ok = false; } else year = y; }
+                    catch (Exception ex) { etYear.setError(getString(R.string.error_invalid_year)); ok = false; }
+                }
+
+                Double price = priceMask.getValue();
+                if (price == null || price <= 0) { etPrice.setError(getString(R.string.error_invalid_price)); ok = false; }
+
+                Integer quantity = 0;
+                if (etQuantity.getText().length() > 0) {
+                    try { int q = Integer.parseInt(etQuantity.getText().toString()); if (q < 0) { etQuantity.setError(getString(R.string.error_invalid_quantity)); ok = false; } else quantity = q; }
+                    catch (Exception ex) { etQuantity.setError(getString(R.string.error_invalid_quantity)); ok = false; }
+                }
+
+                if (!ok) return; // bloqueia salvar se inválido
+
+                String notes = etNotes.getText().toString();
+                String pairing = etPairing.getText().toString();
+                String image = pendingImageUri != null ? pendingImageUri.toString() : null;
+
+                Wine wine = new Wine(null, name, type, year, price, notes, pairing, image, quantity);
+                repo.add(wine);
+                refreshList();
+                pendingImageUri = null;
+                pendingPreview = null;
+                dialog.dismiss();
+            });
+        });
+
+        dialog.show();
     }
 
     // Simple item decoration to add spacing in grid
@@ -253,10 +306,11 @@ public class CatalogActivity extends AppCompatActivity {
             TextView tvPrice = h.itemView.findViewById(R.id.tvWinePrice);
             TextView tvQty = h.itemView.findViewById(R.id.tvWineQuantity);
             tvType.setText(w.getType() != null ? w.getType() : "");
-            tvYear.setText(w.getYear() != null ? "Safra " + w.getYear() : "");
+            tvYear.setText(w.getYear() != null ? h.itemView.getContext().getString(R.string.wine_year_format, w.getYear()) : "");
             tvName.setText(w.getName() != null ? w.getName() : "");
-            tvPrice.setText(w.getPrice() != null ? String.format("R$ %.2f", w.getPrice()) : "");
-            tvQty.setText("Estoque: " + (w.getQuantity() != null ? w.getQuantity() : 0));
+            tvPrice.setText(w.getPrice() != null ? h.itemView.getContext().getString(R.string.wine_price_format, w.getPrice()) : "");
+            int stockQty = w.getQuantity() != null ? w.getQuantity() : 0;
+            tvQty.setText(h.itemView.getContext().getString(R.string.wine_stock_format, stockQty));
             ImageButton btnDelete = h.itemView.findViewById(R.id.btnDeleteWine);
             btnDelete.setOnClickListener(v -> {
                 if (repo == null || w.getId() == null) return;

@@ -13,6 +13,7 @@ import android.widget.ImageButton;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.LinearLayout; // added
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
@@ -203,7 +204,6 @@ public class OrdersActivity extends AppCompatActivity {
         spStatus.setAdapter(statusAdapter);
 
         btnAddProductRow.setOnClickListener(v -> addProductRow(containerProducts, null));
-        // adiciona primeira linha (pré-selecionada se houver)
         addProductRow(containerProducts, preselectedWineId);
 
         AlertDialog dialog = new AlertDialog.Builder(this)
@@ -212,13 +212,32 @@ public class OrdersActivity extends AppCompatActivity {
 
         btnCancel.setOnClickListener(v -> dialog.dismiss());
         btnCreate.setOnClickListener(v -> {
+            // Validações
             int clientIndex = spClient.getSelectedItemPosition();
-            if (clientIndex < 0 || clientIndex >= clients.size()) { dialog.dismiss(); return; }
+            if (clientIndex < 0 || clientIndex >= clients.size()) {
+                Toast.makeText(this, R.string.error_order_client_required, Toast.LENGTH_SHORT).show();
+                return;
+            }
+            List<OrderItem> items = collectItemsPersistent(containerProducts);
+            if (items.isEmpty()) {
+                Toast.makeText(this, R.string.error_order_need_item, Toast.LENGTH_SHORT).show();
+                return;
+            }
+            // Verifica quantidades e estoque
+            for (OrderItem oi : items) {
+                Wine w = oi.getWine();
+                if (oi.getQuantity() <= 0) {
+                    Toast.makeText(this, R.string.error_order_invalid_quantity, Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                if (w != null && w.getQuantity() != null && oi.getQuantity() > w.getQuantity()) {
+                    Toast.makeText(this, R.string.error_order_stock_unavailable, Toast.LENGTH_SHORT).show();
+                    return;
+                }
+            }
             Client selectedClient = clients.get(clientIndex);
             String paymentMethod = (String) spPayment.getSelectedItem();
             String statusCode = getStatusCodeByLabel((String) spStatus.getSelectedItem());
-            List<OrderItem> items = collectItemsPersistent(containerProducts);
-            if (items.isEmpty()) { dialog.dismiss(); return; }
             Order newOrder = new Order();
             newOrder.setNumber(orderRepo.nextNumber());
             newOrder.setClientId(selectedClient.getId());
@@ -235,17 +254,22 @@ public class OrdersActivity extends AppCompatActivity {
     }
 
     private void addProductRow(ViewGroup container, Long preselectedWineId) {
-            List<Wine> wines = wineDao.findAll();
+        List<Wine> wines = wineDao.findAll();
         if (wines.isEmpty()) {
             TextView tv = new TextView(this);
             tv.setText(R.string.no_wines_available);
             container.addView(tv);
             return;
         }
+        LinearLayout ll = new LinearLayout(this);
+        ll.setOrientation(LinearLayout.HORIZONTAL);
+        ll.setPadding(0,8,0,8);
+
         Spinner sp = new Spinner(this);
         EditText qty = new EditText(this);
         qty.setInputType(android.text.InputType.TYPE_CLASS_NUMBER);
         qty.setText("1");
+        qty.setEms(3);
         ArrayAdapter<String> wineAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, mapWines(wines));
         wineAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         sp.setAdapter(wineAdapter);
@@ -253,8 +277,7 @@ public class OrdersActivity extends AppCompatActivity {
             for (int i = 0; i < wines.size(); i++) {
                 Wine w = wines.get(i);
                 if (w.getId() != null && w.getId().equals(preselectedWineId)) {
-                    Integer stock = w.getQuantity();
-                    if (stock != null && stock <= 0) {
+                    if (w.getQuantity() != null && w.getQuantity() <= 0) {
                         new AlertDialog.Builder(this)
                                 .setTitle(R.string.stock_unavailable_title)
                                 .setMessage(R.string.stock_unavailable_message)
@@ -266,12 +289,25 @@ public class OrdersActivity extends AppCompatActivity {
                 }
             }
         }
-        LinearLayout ll = new LinearLayout(this);
-        ll.setOrientation(LinearLayout.HORIZONTAL);
+        // Botão remover
+        ImageButton btnRemove = new ImageButton(this);
+        btnRemove.setImageResource(R.drawable.ic_delete);
+        btnRemove.setBackgroundColor(0x00000000);
+        LinearLayout.LayoutParams removeParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        removeParams.setMargins(16,0,0,0);
+        btnRemove.setOnClickListener(v -> {
+            if (container.getChildCount() <= 1) {
+                Toast.makeText(this, R.string.error_order_need_item, Toast.LENGTH_SHORT).show();
+                return;
+            }
+            container.removeView(ll);
+        });
+
         ll.addView(sp, new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1));
         LinearLayout.LayoutParams qtyParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         qtyParams.setMargins(16,0,0,0);
         ll.addView(qty, qtyParams);
+        ll.addView(btnRemove, removeParams);
         container.addView(ll);
     }
 

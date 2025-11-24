@@ -20,6 +20,8 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.myapplication.data.model.Client;
 import com.example.myapplication.data.repository.ClientRepository;
+import com.example.myapplication.util.BrDocumentMask;
+import com.example.myapplication.util.BrPhoneMask;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -99,21 +101,37 @@ public class ClientsActivity extends AppCompatActivity {
         EditText etResponsible = form.findViewById(R.id.etResponsible);
         EditText etPhone = form.findViewById(R.id.etPhone);
 
-        new AlertDialog.Builder(this)
+        BrDocumentMask docMask = new BrDocumentMask(etDocument);
+        etDocument.addTextChangedListener(docMask);
+        BrPhoneMask phoneMask = new BrPhoneMask(etPhone);
+        etPhone.addTextChangedListener(phoneMask);
+
+        AlertDialog dlg = new AlertDialog.Builder(this)
                 .setTitle(R.string.new_client_title)
                 .setView(form)
-                .setPositiveButton(R.string.dialog_save, (d, w) -> {
-                    String name = etName.getText().toString().trim();
-                    String doc = etDocument.getText().toString().trim();
-                    String addr = etAddress.getText().toString().trim();
-                    String resp = etResponsible.getText().toString().trim();
-                    String phone = etPhone.getText().toString().trim();
-                    if (name.isEmpty()) return;
-                    repo.add(new Client(null, name, doc, addr, resp, phone));
-                    refreshList();
-                })
+                .setPositiveButton(R.string.dialog_save, null)
                 .setNegativeButton(R.string.dialog_cancel, null)
-                .show();
+                .create();
+        dlg.setOnShowListener(l -> {
+            dlg.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(v -> {
+                boolean ok = true;
+                String name = etName.getText().toString().trim();
+                if (name.isEmpty()) { etName.setError(getString(R.string.error_client_name_required)); ok = false; }
+                String addr = etAddress.getText().toString().trim();
+                if (addr.isEmpty()) { etAddress.setError(getString(R.string.error_client_address_required)); ok = false; }
+                String resp = etResponsible.getText().toString().trim();
+                if (resp.isEmpty()) { etResponsible.setError(getString(R.string.error_client_responsible_required)); ok = false; }
+                if (!docMask.isValid()) { etDocument.setError(getString(R.string.error_client_document_invalid)); ok = false; }
+                if (!phoneMask.isValid()) { etPhone.setError(getString(R.string.error_client_phone_invalid)); ok = false; }
+                if (!ok) return;
+                String doc = etDocument.getText().toString().trim();
+                String phone = etPhone.getText().toString().trim();
+                repo.add(new Client(null, name, doc, addr, resp, phone));
+                refreshList();
+                dlg.dismiss();
+            });
+        });
+        dlg.show();
     }
 
     // Open the client detail dialog with Edit/Delete actions
@@ -161,29 +179,44 @@ public class ClientsActivity extends AppCompatActivity {
         EditText etResponsible = form.findViewById(R.id.etResponsible);
         EditText etPhone = form.findViewById(R.id.etPhone);
 
-        // Prefill
         etName.setText(c.getName());
         etDocument.setText(c.getDocument());
         etAddress.setText(c.getAddress());
         etResponsible.setText(c.getResponsible());
         etPhone.setText(c.getPhone());
 
-        new AlertDialog.Builder(this)
+        BrDocumentMask docMask = new BrDocumentMask(etDocument);
+        etDocument.addTextChangedListener(docMask);
+        BrPhoneMask phoneMask = new BrPhoneMask(etPhone);
+        etPhone.addTextChangedListener(phoneMask);
+
+        AlertDialog dlg = new AlertDialog.Builder(this)
                 .setTitle(R.string.edit_client_title)
                 .setView(form)
-                .setPositiveButton(R.string.dialog_save, (d, w) -> {
-                    String name = etName.getText().toString().trim();
-                    String doc = etDocument.getText().toString().trim();
-                    String addr = etAddress.getText().toString().trim();
-                    String resp = etResponsible.getText().toString().trim();
-                    String phone = etPhone.getText().toString().trim();
-                    if (name.isEmpty()) return;
-                    Client updated = new Client(c.getId(), name, doc, addr, resp, phone);
-                    repo.update(updated);
-                    refreshList();
-                })
+                .setPositiveButton(R.string.dialog_save, null)
                 .setNegativeButton(R.string.dialog_cancel, null)
-                .show();
+                .create();
+        dlg.setOnShowListener(l -> {
+            dlg.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(v -> {
+                boolean ok = true;
+                String name = etName.getText().toString().trim();
+                if (name.isEmpty()) { etName.setError(getString(R.string.error_client_name_required)); ok = false; }
+                String addr = etAddress.getText().toString().trim();
+                if (addr.isEmpty()) { etAddress.setError(getString(R.string.error_client_address_required)); ok = false; }
+                String resp = etResponsible.getText().toString().trim();
+                if (resp.isEmpty()) { etResponsible.setError(getString(R.string.error_client_responsible_required)); ok = false; }
+                if (!docMask.isValid()) { etDocument.setError(getString(R.string.error_client_document_invalid)); ok = false; }
+                if (!phoneMask.isValid()) { etPhone.setError(getString(R.string.error_client_phone_invalid)); ok = false; }
+                if (!ok) return;
+                String doc = etDocument.getText().toString().trim();
+                String phone = etPhone.getText().toString().trim();
+                Client updated = new Client(c.getId(), name, doc, addr, resp, phone);
+                repo.update(updated);
+                refreshList();
+                dlg.dismiss();
+            });
+        });
+        dlg.show();
     }
 
     static class ClientsAdapter extends RecyclerView.Adapter<ClientsAdapter.VH> {

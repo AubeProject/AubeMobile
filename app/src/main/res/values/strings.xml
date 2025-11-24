@@ -163,4 +163,24 @@
     <string name="edit_wine_button">Editar Produto</string>
     <string name="save_wine_changes">Salvar Alterações</string>
     <string name="wine_year_format">Safra %1$d</string>
+    <string name="wine_price_format">R$ %.2f</string>
+    <string name="wine_stock_format">Estoque: %1$d</string>
+
+    <!-- Error Messages -->
+    <string name="error_required">Campo obrigatório</string>
+    <string name="error_invalid_year">Ano inválido</string>
+    <string name="error_invalid_price">Preço inválido</string>
+    <string name="error_invalid_quantity">Quantidade inválida</string>
+    <string name="error_min_length_name">Informe ao menos 3 caracteres</string>
+    <string name="error_type_required">Informe o tipo</string>
+    <string name="error_client_name_required">Nome obrigatório</string>
+    <string name="error_client_document_invalid">Documento inválido</string>
+    <string name="error_client_address_required">Endereço obrigatório</string>
+    <string name="error_client_responsible_required">Responsável obrigatório</string>
+    <string name="error_client_phone_invalid">Telefone inválido</string>
+    <string name="error_order_client_required">Selecione um cliente</string>
+    <string name="error_order_need_item">Adicione ao menos um produto</string>
+    <string name="error_order_invalid_quantity">Quantidade inválida</string>
+    <string name="error_order_stock_unavailable">Sem estoque suficiente</string>
+    <string name="action_remove_item">Remover</string>
 </resources>

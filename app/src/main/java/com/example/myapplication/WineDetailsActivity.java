@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Spinner;
@@ -54,7 +55,7 @@ public class WineDetailsActivity extends AppCompatActivity {
         tvType.setText(wine.getType() != null ? wine.getType() : "");
         tvName.setText(wine.getName());
         tvYear.setText(wine.getYear() != null ? getString(R.string.wine_year_format, wine.getYear()) : "");
-        tvPrice.setText(wine.getPrice() != null ? String.format(Locale.getDefault(), "R$ %.2f", wine.getPrice()) : "");
+        tvPrice.setText(wine.getPrice() != null ? getString(R.string.wine_price_format, wine.getPrice()) : "");
         tvNotes.setText(wine.getNotes() != null && !wine.getNotes().isEmpty() ? wine.getNotes() : getString(R.string.em_dash));
         tvPairing.setText(wine.getPairing() != null && !wine.getPairing().isEmpty() ? wine.getPairing() : getString(R.string.em_dash));
         tvQuantity.setText(String.valueOf(wine.getQuantity() != null ? wine.getQuantity() : 0));
@@ -88,13 +89,11 @@ public class WineDetailsActivity extends AppCompatActivity {
         ImageView ivPreview = form.findViewById(R.id.ivPreview);
         View pickArea = form.findViewById(R.id.pickImageArea);
 
-        // Configura spinner de tipos (sempre)
         String[] types = new String[]{"Tinto", "Branco", "Rosé", "Espumante"};
         ArrayAdapter<String> typeAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, types);
         typeAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spType.setAdapter(typeAdapter);
 
-        // Pre-fill
         etName.setText(wine.getName());
         if (wine.getType() != null) {
             for (int i = 0; i < types.length; i++) if (types[i].equalsIgnoreCase(wine.getType())) { spType.setSelection(i); break; }
@@ -107,30 +106,63 @@ public class WineDetailsActivity extends AppCompatActivity {
         if (wine.getImageUri() != null) {
             try { ivPreview.setImageURI(Uri.parse(wine.getImageUri())); ivPreview.setVisibility(View.VISIBLE);} catch (Exception ignore) {}
         }
-        pickArea.setOnClickListener(v -> {/* futura seleção de imagem */});
+        pickArea.setOnClickListener(v -> {/* seleção de nova imagem pode ser implementada */});
 
-        new AlertDialog.Builder(this)
+        AlertDialog dlg = new AlertDialog.Builder(this)
                 .setTitle(R.string.edit_wine_title)
                 .setView(form)
-                .setPositiveButton(R.string.save_wine_changes, (d,wBtn) -> {
-                    wine.setName(etName.getText().toString().trim());
-                    wine.setType(spType.getSelectedItem() != null ? spType.getSelectedItem().toString() : wine.getType());
-                    try { wine.setYear(etYear.getText().length()>0 ? Integer.parseInt(etYear.getText().toString()) : null); } catch (Exception ignore) {}
-                    try { wine.setPrice(etPrice.getText().length()>0 ? Double.valueOf(etPrice.getText().toString().replace(",",".")) : null);} catch(Exception ignore) {}
-                    wine.setNotes(etNotes.getText().toString());
-                    wine.setPairing(etPairing.getText().toString());
-                    int q = 0; try { q = Integer.parseInt(etQuantity.getText().toString()); } catch (Exception ignore) {}
-                    wine.setQuantity(q);
-                    new WineRepository(this).update(wine);
-                    ((TextView) findViewById(R.id.tvType)).setText(wine.getType());
-                    ((TextView) findViewById(R.id.tvName)).setText(wine.getName());
-                    ((TextView) findViewById(R.id.tvYear)).setText(wine.getYear()!=null? getString(R.string.wine_year_format, wine.getYear()):"");
-                    ((TextView) findViewById(R.id.tvPrice)).setText(wine.getPrice()!=null? String.format(Locale.getDefault(), "R$ %.2f", wine.getPrice()):"");
-                    ((TextView) findViewById(R.id.tvNotes)).setText(wine.getNotes()!=null && !wine.getNotes().isEmpty()? wine.getNotes(): getString(R.string.em_dash));
-                    ((TextView) findViewById(R.id.tvPairing)).setText(wine.getPairing()!=null && !wine.getPairing().isEmpty()? wine.getPairing(): getString(R.string.em_dash));
-                    tvQuantity.setText(String.valueOf(wine.getQuantity()));
-                })
+                .setPositiveButton(R.string.save_wine_changes, null)
                 .setNegativeButton(R.string.dialog_cancel, null)
-                .show();
+                .create();
+
+        dlg.setOnShowListener(l -> {
+            Button btn = dlg.getButton(AlertDialog.BUTTON_POSITIVE);
+            btn.setOnClickListener(v -> {
+                boolean ok = true;
+                String name = etName.getText().toString().trim();
+                if (name.isEmpty()) { etName.setError(getString(R.string.error_required)); ok = false; }
+                else if (name.length() < 3) { etName.setError(getString(R.string.error_min_length_name)); ok = false; }
+
+                Integer year = null;
+                if (etYear.getText().length() > 0) {
+                    try { int y = Integer.parseInt(etYear.getText().toString()); if (y < 1900 || y > 2100) { etYear.setError(getString(R.string.error_invalid_year)); ok = false; } else year = y; }
+                    catch (Exception e) { etYear.setError(getString(R.string.error_invalid_year)); ok = false; }
+                }
+
+                Double price = null;
+                if (etPrice.getText().length() > 0) {
+                    try { double p = Double.parseDouble(etPrice.getText().toString().replace(",",".")); if (p <= 0) { etPrice.setError(getString(R.string.error_invalid_price)); ok = false; } else price = p; }
+                    catch (Exception e) { etPrice.setError(getString(R.string.error_invalid_price)); ok = false; }
+                }
+
+                Integer quantity = 0;
+                if (etQuantity.getText().length() > 0) {
+                    try { int q = Integer.parseInt(etQuantity.getText().toString()); if (q < 0) { etQuantity.setError(getString(R.string.error_invalid_quantity)); ok = false; } else quantity = q; }
+                    catch (Exception e) { etQuantity.setError(getString(R.string.error_invalid_quantity)); ok = false; }
+                }
+
+                if (!ok) return;
+
+                wine.setName(name);
+                wine.setType(spType.getSelectedItem() != null ? spType.getSelectedItem().toString() : wine.getType());
+                wine.setYear(year);
+                wine.setPrice(price);
+                wine.setNotes(etNotes.getText().toString());
+                wine.setPairing(etPairing.getText().toString());
+                wine.setQuantity(quantity);
+                new WineRepository(this).update(wine);
+
+                ((TextView) findViewById(R.id.tvType)).setText(wine.getType());
+                ((TextView) findViewById(R.id.tvName)).setText(wine.getName());
+                ((TextView) findViewById(R.id.tvYear)).setText(wine.getYear()!=null? getString(R.string.wine_year_format, wine.getYear()):"");
+                ((TextView) findViewById(R.id.tvPrice)).setText(wine.getPrice()!=null? getString(R.string.wine_price_format, wine.getPrice()):"");
+                ((TextView) findViewById(R.id.tvNotes)).setText(wine.getNotes()!=null && !wine.getNotes().isEmpty()? wine.getNotes(): getString(R.string.em_dash));
+                ((TextView) findViewById(R.id.tvPairing)).setText(wine.getPairing()!=null && !wine.getPairing().isEmpty()? wine.getPairing(): getString(R.string.em_dash));
+                tvQuantity.setText(String.valueOf(wine.getQuantity()!=null? wine.getQuantity():0));
+                dlg.dismiss();
+            });
+        });
+
+        dlg.show();
     }
 }
