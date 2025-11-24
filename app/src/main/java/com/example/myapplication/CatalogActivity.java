@@ -78,6 +78,7 @@ public class CatalogActivity extends AppCompatActivity {
         rv.setLayoutManager(glm);
         rv.addItemDecoration(new SpacingDecoration(8)); // 8dp spacing
         adapter = new WinesAdapter();
+        adapter.attachRepo(repo);
         rv.setAdapter(adapter);
 
         // Carrega dados
@@ -212,6 +213,9 @@ public class CatalogActivity extends AppCompatActivity {
         private final List<Wine> visible = new ArrayList<>();
         private String query = "";
         private String typeFilter = null;
+        private WineRepository repo; // referência para exclusão
+
+        void attachRepo(WineRepository r) { this.repo = r; }
 
         void setData(List<Wine> data) {
             all.clear();
@@ -242,14 +246,31 @@ public class CatalogActivity extends AppCompatActivity {
             ImageView iv = h.itemView.findViewById(R.id.ivWine);
             if (w.getImageUri() != null) {
                 try { iv.setImageURI(Uri.parse(w.getImageUri())); } catch (Exception ignore) {}
-            } else {
-                iv.setImageResource(R.drawable.vinho);
-            }
-            ((TextView) h.itemView.findViewById(R.id.tvWineName)).setText(w.getName());
-            ((TextView) h.itemView.findViewById(R.id.tvWineType)).setText(w.getType() != null ? w.getType() : "");
-            ((TextView) h.itemView.findViewById(R.id.tvWineYear)).setText(w.getYear() != null ? "Safra " + w.getYear() : "");
-            ((TextView) h.itemView.findViewById(R.id.tvWinePrice)).setText(w.getPrice() != null ? String.format("R$ %.2f", w.getPrice()) : "");
-            ((TextView) h.itemView.findViewById(R.id.tvWineQuantity)).setText("Estoque: " + (w.getQuantity() != null ? w.getQuantity() : 0));
+            } else { iv.setImageResource(R.drawable.vinho); }
+            TextView tvType = h.itemView.findViewById(R.id.tvWineType);
+            TextView tvYear = h.itemView.findViewById(R.id.tvWineYear);
+            TextView tvName = h.itemView.findViewById(R.id.tvWineName);
+            TextView tvPrice = h.itemView.findViewById(R.id.tvWinePrice);
+            TextView tvQty = h.itemView.findViewById(R.id.tvWineQuantity);
+            tvType.setText(w.getType() != null ? w.getType() : "");
+            tvYear.setText(w.getYear() != null ? "Safra " + w.getYear() : "");
+            tvName.setText(w.getName() != null ? w.getName() : "");
+            tvPrice.setText(w.getPrice() != null ? String.format("R$ %.2f", w.getPrice()) : "");
+            tvQty.setText("Estoque: " + (w.getQuantity() != null ? w.getQuantity() : 0));
+            ImageButton btnDelete = h.itemView.findViewById(R.id.btnDeleteWine);
+            btnDelete.setOnClickListener(v -> {
+                if (repo == null || w.getId() == null) return;
+                new androidx.appcompat.app.AlertDialog.Builder(v.getContext())
+                        .setTitle(R.string.delete_wine_title)
+                        .setMessage(v.getContext().getString(R.string.delete_wine_confirm, w.getName()))
+                        .setPositiveButton(R.string.action_delete, (d, which) -> {
+                            repo.delete(w.getId());
+                            all.remove(w);
+                            applyFilters();
+                        })
+                        .setNegativeButton(R.string.dialog_cancel, null)
+                        .show();
+            });
             h.itemView.setOnClickListener(v -> {
                 Context ctx = v.getContext();
                 Intent it = new Intent(ctx, WineDetailsActivity.class);

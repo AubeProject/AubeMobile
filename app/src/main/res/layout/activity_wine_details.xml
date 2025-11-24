@@ -147,7 +147,7 @@
                     android:id="@+id/tvQuantityLabel"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Quantidade em estoque"
+                    android:text="@string/label_quantity"
                     android:textColor="#6A6A6A"
                     android:layout_marginTop="12dp"/>
                 <LinearLayout
@@ -159,18 +159,37 @@
                         android:id="@+id/tvQuantity"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="0"
+                        android:text="@string/em_dash"
                         android:textColor="#2B2B2B"
                         android:textSize="16sp"
                         android:layout_marginEnd="12dp"/>
-                    <Button
-                        android:id="@+id/btnEditQuantity"
+                    <LinearLayout
+                        android:id="@+id/btnEditWine"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Editar"
-                        android:textColor="#FFFFFF"
-                        android:backgroundTint="#F57C00"
-                        android:background="@drawable/edit_text_bg"/>
+                        android:orientation="horizontal"
+                        android:paddingStart="10dp"
+                        android:paddingEnd="12dp"
+                        android:paddingTop="6dp"
+                        android:paddingBottom="6dp"
+                        android:background="@drawable/bg_edit_outline"
+                        android:gravity="center_vertical"
+                        android:clickable="true"
+                        android:focusable="true">
+                        <ImageView
+                            android:layout_width="18dp"
+                            android:layout_height="18dp"
+                            android:src="@drawable/ic_edit"
+                            android:contentDescription="@string/edit_wine_button"/>
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/edit_wine_button"
+                            android:textColor="#F57C00"
+                            android:textStyle="bold"
+                            android:textSize="14sp"
+                            android:layout_marginStart="6dp"/>
+                    </LinearLayout>
                 </LinearLayout>
 
                 <LinearLayout

@@ -152,4 +152,15 @@
     <string name="generic_item">Item</string>
     <string name="no_wines_available">Nenhum produto disponível</string>
     <string name="order_item_line">• %1$s x%2$d</string>
+
+    <!-- Wine deletion -->
+    <string name="delete_wine_cd">Excluir produto</string>
+    <string name="delete_wine_title">Excluir Produto</string>
+    <string name="delete_wine_confirm">Deseja excluir o produto %1$s?</string>
+
+    <!-- Edit Wine -->
+    <string name="edit_wine_title">Editar Produto</string>
+    <string name="edit_wine_button">Editar Produto</string>
+    <string name="save_wine_changes">Salvar Alterações</string>
+    <string name="wine_year_format">Safra %1$d</string>
 </resources>
