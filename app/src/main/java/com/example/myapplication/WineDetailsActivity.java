@@ -32,7 +32,7 @@ public class WineDetailsActivity extends AppCompatActivity {
         if (wine == null) { finish(); return; }
 
         ImageView btnBack = findViewById(R.id.btnBack);
-        btnBack.setOnClickListener(v -> onBackPressed());
+        btnBack.setOnClickListener(v -> finish());
 
         ImageView ivHero = findViewById(R.id.ivHero);
         TextView tvType = findViewById(R.id.tvType);
@@ -62,7 +62,7 @@ public class WineDetailsActivity extends AppCompatActivity {
             input.setInputType(InputType.TYPE_CLASS_NUMBER);
             input.setText(String.valueOf(wine.getQuantity() != null ? wine.getQuantity() : 0));
             new AlertDialog.Builder(this)
-                .setTitle("Editar quantidade em estoque")
+                .setTitle(R.string.edit_quantity_title)
                 .setView(input)
                 .setPositiveButton("Salvar", (dialog, which) -> {
                     int newQuantity = 0;
@@ -77,8 +77,17 @@ public class WineDetailsActivity extends AppCompatActivity {
         });
 
         findViewById(R.id.btnAddToOrder).setOnClickListener(v -> {
-            v.setEnabled(false);
-            v.postDelayed(() -> v.setEnabled(true), 600);
+            if (wine.getQuantity() == null || wine.getQuantity() <= 0) {
+                new AlertDialog.Builder(this)
+                        .setTitle(R.string.stock_unavailable_title)
+                        .setMessage(R.string.stock_unavailable_message)
+                        .setPositiveButton(android.R.string.ok, null)
+                        .show();
+                return;
+            }
+            android.content.Intent intent = new android.content.Intent(this, OrdersActivity.class);
+            intent.putExtra(OrdersActivity.EXTRA_PRESELECTED_WINE_ID, wine.getId());
+            startActivity(intent);
         });
     }
 }

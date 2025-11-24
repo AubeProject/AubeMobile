@@ -6,7 +6,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 public class AppDatabase extends SQLiteOpenHelper {
     public static final String DATABASE_NAME = "app.db";
-    public static final int DATABASE_VERSION = 4; // bump for clients table
+    public static final int DATABASE_VERSION = 5; // bump for orders tables
 
     // User table
     public static final String TABLE_USERS = "users";
@@ -34,6 +34,21 @@ public class AppDatabase extends SQLiteOpenHelper {
     public static final String COL_CLIENT_ADDRESS = "address";   // endereço/localização
     public static final String COL_CLIENT_RESPONSIBLE = "responsible"; // responsável
     public static final String COL_CLIENT_PHONE = "phone";       // telefone
+
+    // Orders table
+    public static final String TABLE_ORDERS = "orders";
+    public static final String COL_ORDER_ID = "id";
+    public static final String COL_ORDER_NUMBER = "number";
+    public static final String COL_ORDER_CLIENT_ID = "client_id";
+    public static final String COL_ORDER_DATE = "date"; // epoch millis
+    public static final String COL_ORDER_STATUS = "status"; // PENDING, DELIVERED...
+    public static final String COL_ORDER_PAYMENT = "payment";
+
+    public static final String TABLE_ORDER_ITEMS = "order_items";
+    public static final String COL_ORDER_ITEM_ID = "id";
+    public static final String COL_ORDER_ITEM_ORDER_ID = "order_id";
+    public static final String COL_ORDER_ITEM_WINE_ID = "wine_id";
+    public static final String COL_ORDER_ITEM_QTY = "quantity";
 
     private static volatile AppDatabase INSTANCE; // singleton
 
@@ -83,6 +98,26 @@ public class AppDatabase extends SQLiteOpenHelper {
                 COL_CLIENT_PHONE + " TEXT" +
                 ");";
         db.execSQL(CREATE_CLIENTS);
+
+        String CREATE_ORDERS = "CREATE TABLE IF NOT EXISTS " + TABLE_ORDERS + " (" +
+                COL_ORDER_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                COL_ORDER_NUMBER + " INTEGER NOT NULL, " +
+                COL_ORDER_CLIENT_ID + " INTEGER, " +
+                COL_ORDER_DATE + " INTEGER, " +
+                COL_ORDER_STATUS + " TEXT, " +
+                COL_ORDER_PAYMENT + " TEXT, " +
+                "FOREIGN KEY(" + COL_ORDER_CLIENT_ID + ") REFERENCES " + TABLE_CLIENTS + "(" + COL_CLIENT_ID + ")" +
+                ");";
+        db.execSQL(CREATE_ORDERS);
+        String CREATE_ORDER_ITEMS = "CREATE TABLE IF NOT EXISTS " + TABLE_ORDER_ITEMS + " (" +
+                COL_ORDER_ITEM_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                COL_ORDER_ITEM_ORDER_ID + " INTEGER NOT NULL, " +
+                COL_ORDER_ITEM_WINE_ID + " INTEGER, " +
+                COL_ORDER_ITEM_QTY + " INTEGER NOT NULL, " +
+                "FOREIGN KEY(" + COL_ORDER_ITEM_ORDER_ID + ") REFERENCES " + TABLE_ORDERS + "(" + COL_ORDER_ID + ")," +
+                "FOREIGN KEY(" + COL_ORDER_ITEM_WINE_ID + ") REFERENCES " + TABLE_WINES + "(" + COL_WINE_ID + ")" +
+                ");";
+        db.execSQL(CREATE_ORDER_ITEMS);
     }
 
     @Override
@@ -100,6 +135,27 @@ public class AppDatabase extends SQLiteOpenHelper {
                     COL_CLIENT_PHONE + " TEXT" +
                     ");";
             db.execSQL(CREATE_CLIENTS);
+        }
+        if (oldVersion < 5) {
+            String CREATE_ORDERS = "CREATE TABLE IF NOT EXISTS " + TABLE_ORDERS + " (" +
+                    COL_ORDER_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                    COL_ORDER_NUMBER + " INTEGER NOT NULL, " +
+                    COL_ORDER_CLIENT_ID + " INTEGER, " +
+                    COL_ORDER_DATE + " INTEGER, " +
+                    COL_ORDER_STATUS + " TEXT, " +
+                    COL_ORDER_PAYMENT + " TEXT, " +
+                    "FOREIGN KEY(" + COL_ORDER_CLIENT_ID + ") REFERENCES " + TABLE_CLIENTS + "(" + COL_CLIENT_ID + ")" +
+                    ");";
+            db.execSQL(CREATE_ORDERS);
+            String CREATE_ORDER_ITEMS = "CREATE TABLE IF NOT EXISTS " + TABLE_ORDER_ITEMS + " (" +
+                    COL_ORDER_ITEM_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                    COL_ORDER_ITEM_ORDER_ID + " INTEGER NOT NULL, " +
+                    COL_ORDER_ITEM_WINE_ID + " INTEGER, " +
+                    COL_ORDER_ITEM_QTY + " INTEGER NOT NULL, " +
+                    "FOREIGN KEY(" + COL_ORDER_ITEM_ORDER_ID + ") REFERENCES " + TABLE_ORDERS + "(" + COL_ORDER_ID + ")," +
+                    "FOREIGN KEY(" + COL_ORDER_ITEM_WINE_ID + ") REFERENCES " + TABLE_WINES + "(" + COL_WINE_ID + ")" +
+                    ");";
+            db.execSQL(CREATE_ORDER_ITEMS);
         }
     }
 }

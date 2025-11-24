@@ -22,7 +22,7 @@
     <string name="carousel_default_icon">D</string>
     <string name="carousel_label">Label</string>
 
-    <!-- Dashboard strings -->
+    <!-- Dashboard -->
     <string name="dashboard_title">Dashboard</string>
     <string name="dashboard_subtitle">Representante Comercial</string>
     <string name="period_week">Semana</string>
@@ -51,17 +51,17 @@
 
     <string name="avatar_icon"></string>
 
-    <!-- Catalog strings -->
+    <!-- Catalog -->
     <string name="catalog_header_title">AUBE</string>
     <string name="catalog_header_subtitle">Catálogo de Vinhos</string>
-    <string name="catalog_search_hint">Buscar vinhos...</string>
+    <string name="catalog_search_hint">Buscar vinhos…</string>
     <string name="catalog_all_types">Todos os tipos</string>
     <string name="type_tinto">Tinto</string>
     <string name="type_branco">Branco</string>
     <string name="type_rose">Rosé</string>
     <string name="type_espumante">Espumante</string>
 
-    <!-- Dialog strings -->
+    <!-- Dialog generic -->
     <string name="dialog_image_label">Imagem do Produto</string>
     <string name="dialog_image_hint">Clique para fazer upload\nPNG, JPG até 5MB</string>
     <string name="dialog_name_label">Nome do Vinho</string>
@@ -72,15 +72,15 @@
     <string name="dialog_price_label">Preço</string>
     <string name="dialog_price_hint">Ex: R$ 189,90</string>
     <string name="dialog_notes_label">Notas de Degustação</string>
-    <string name="dialog_notes_hint">Descreva os aromas, sabores e características do vinho...</string>
+    <string name="dialog_notes_hint">Descreva os aromas, sabores e características do vinho…</string>
     <string name="dialog_pairing_label">Harmonização</string>
-    <string name="dialog_pairing_hint">Sugira pratos e alimentos que harmonizam com este vinho...</string>
+    <string name="dialog_pairing_hint">Sugira pratos e alimentos que harmonizam com este vinho…</string>
     <string name="dialog_save">Salvar Produto</string>
     <string name="dialog_cancel">Cancelar</string>
     <string name="dialog_title_add_wine">Cadastrar Vinho</string>
     <string name="content_desc_upload_icon">Ícone de upload</string>
 
-    <!-- Wine details strings -->
+    <!-- Wine details -->
     <string name="back">Voltar</string>
     <string name="wine_details_title">Detalhes do Vinho</string>
     <string name="wine_image">Imagem do vinho</string>
@@ -95,26 +95,61 @@
     <string name="cancel">Cancelar</string>
     <string name="add_wine_button_desc">Adicionar vinho</string>
 
-    <!-- Clients strings -->
+    <!-- Clients -->
     <string name="clients_header_title">Gestão de Clientes</string>
     <string name="clients_header_subtitle">Clientes cadastrados</string>
-    <string name="clients_search_hint">Buscar clientes...</string>
+    <string name="clients_search_hint">Buscar clientes…</string>
     <string name="add_client_button_desc">Adicionar cliente</string>
     <string name="new_client_title">Novo Cliente</string>
     <string name="clients_label_name">Nome/Razão Social</string>
     <string name="clients_hint_name">Ex: Restaurante Villa Toscana</string>
     <string name="clients_label_document">CNPJ/CPF</string>
-    <string name="clients_hint_document">00.000.000/0000-00</string>
+    <string name="clients_hint_document">00.000.000/0000–00</string>
     <string name="clients_label_address">Endereço</string>
     <string name="clients_hint_address">Rua, número, bairro</string>
     <string name="clients_label_responsible">Responsável</string>
     <string name="clients_hint_responsible">Nome do responsável</string>
     <string name="clients_label_phone">Telefone</string>
-    <string name="clients_hint_phone">(00) 00000-0000</string>
+    <string name="clients_hint_phone">(00) 00000–0000</string>
     <string name="action_edit">Editar</string>
     <string name="action_delete">Apagar</string>
     <string name="edit_client_title">Editar Cliente</string>
     <string name="delete_client_title">Apagar Cliente</string>
     <string name="delete_client_confirm">Deseja apagar %1$s?</string>
     <string name="dialog_delete">Apagar</string>
+
+    <!-- Orders -->
+    <string name="orders_header_title">Pedidos e Vendas</string>
+    <string name="orders_header_subtitle_format">%d pedidos registrados</string>
+    <string name="orders_search_hint">Buscar pedidos…</string>
+    <string name="add_order_button_desc">Adicionar pedido</string>
+    <string name="new_order_title">Novo Pedido</string>
+    <string name="create_order_button">Criar Pedido</string>
+    <string name="status_pending">Pendente</string>
+    <string name="status_delivered">Entregue</string>
+    <string name="status_cancelled">Cancelado</string>
+    <string name="status_draft">Rascunho</string>
+    <string name="label_client">Cliente</string>
+    <string name="label_products">Produtos</string>
+    <string name="label_add_product">+ Adicionar Produto</string>
+    <string name="label_payment_method">Forma de Pagamento</string>
+    <string name="label_status">Status</string>
+    <string name="label_total">Total</string>
+    <string name="items_suffix"> itens</string>
+    <string name="order_items_count_format">%1$d itens</string>
+
+    <!-- Order Details -->
+    <string name="order_detail_title">Detalhes do Pedido</string>
+    <string name="edit_order_title">Editar Pedido</string>
+    <string name="delete_order_title">Excluir Pedido</string>
+    <string name="delete_order_confirm">Deseja excluir este pedido?</string>
+    <string name="btn_edit_order">Editar</string>
+    <string name="btn_delete_order">Excluir</string>
+    <string name="order_title_card_format">Pedido #%1$d</string>
+    <string name="order_detail_title_format">Detalhes do Pedido #%1$d</string>
+    <string name="stock_unavailable_title">Sem estoque</string>
+    <string name="stock_unavailable_message">Este produto não possui estoque disponível.</string>
+    <string name="generic_item">Item</string>
+    <string name="no_wines_available">Nenhum produto disponível</string>
+    <string name="order_item_line">• %1$s x%2$d</string>
 </resources>
