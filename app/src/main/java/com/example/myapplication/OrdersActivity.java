@@ -515,12 +515,12 @@ public class OrdersActivity extends AppCompatActivity {
             if (lbl != null && lbl.equals(currentLabel)) { spStatus.setSelection(i); break; }
         }
 
-        // Editable items: populate repeater rows from existing order items
+        // Editable items: repeater preenchido com os itens do pedido
         List<Wine> allWines = wineDao.findAll();
+        containerProducts.removeAllViews();
         if (finalOrder.getItems() != null && !finalOrder.getItems().isEmpty()) {
             for (OrderItem it : finalOrder.getItems()) {
                 addProductRow(containerProducts, it.getWineId());
-                // set quantity on the last added row
                 View row = containerProducts.getChildAt(containerProducts.getChildCount()-1);
                 if (row instanceof LinearLayout) {
                     for (int j=0;j<((LinearLayout)row).getChildCount();j++) {
@@ -546,7 +546,7 @@ public class OrdersActivity extends AppCompatActivity {
             if (clientIndex >= 0 && clientIndex < clients.size()) finalOrder.setClientId(clients.get(clientIndex).getId());
             String previousStatus = finalOrder.getStatus();
             String paymentStateLabel = (String) spPayment.getSelectedItem();
-            finalOrder.setPayment("Pagamento Feita".equals(paymentStateLabel) ? "PAID" : "PENDING");
+            finalOrder.setPayment("Pagamento Feito".equals(paymentStateLabel) ? "PAID" : "PENDING");
             finalOrder.setStatus(getStatusCodeByLabel((String) spStatus.getSelectedItem()));
             List<OrderItem> newItems = collectItemsPersistent(containerProducts);
             if (newItems.isEmpty()) {
@@ -554,19 +554,8 @@ public class OrdersActivity extends AppCompatActivity {
                 return;
             }
             finalOrder.setItems(newItems);
-            orderRepo.update(finalOrder);
-            if (!STATUS_DELIVERED.equals(previousStatus) && STATUS_DELIVERED.equals(finalOrder.getStatus())) {
-                for (OrderItem oi : newItems) {
-                    Wine w = oi.getWine();
-                    if (w == null) { w = wineDao.findById(oi.getWineId()); }
-                    if (w != null && w.getQuantity() != null) {
-                        int newQty = Math.max(0, w.getQuantity() - oi.getQuantity());
-                        w.setQuantity(newQty);
-                        wineDao.update(w);
-                    }
-                }
-            }
-            loadOrdersFromDb();
+            orderRepo.update(finalOrder); // persiste alterações
+            loadOrdersFromDb(); // recarrega lista
             dialog.dismiss();
         });
         dialog.show();

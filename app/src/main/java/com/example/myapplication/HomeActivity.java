@@ -18,9 +18,20 @@ import java.util.Locale;
 import java.util.List;
 import java.util.Set;
 
+import com.example.myapplication.data.dao.WineDao;
+import com.example.myapplication.data.dao.impl.WineDaoImpl;
+import com.example.myapplication.data.db.AppDatabase;
 import com.example.myapplication.data.model.Order;
 import com.example.myapplication.data.model.OrderItem;
+import com.example.myapplication.data.model.Wine;
 import com.example.myapplication.data.repository.OrderRepository;
+import com.github.mikephil.charting.charts.BarChart;
+import com.github.mikephil.charting.data.BarData;
+import com.github.mikephil.charting.data.BarDataSet;
+import com.github.mikephil.charting.data.BarEntry;
+import com.github.mikephil.charting.components.XAxis;
+import com.github.mikephil.charting.components.YAxis;
+import com.github.mikephil.charting.formatter.ValueFormatter;
 
 public class HomeActivity extends AppCompatActivity {
 
@@ -70,22 +81,105 @@ public class HomeActivity extends AppCompatActivity {
         OrderRepository repo = new OrderRepository(this);
         long now = System.currentTimeMillis();
         long start;
+        int numBuckets;
         switch (currentPeriod) {
-            case WEEK: start = now - 7L*24*60*60*1000; break;
-            case MONTH: start = now - 30L*24*60*60*1000; break;
-            case YEAR: default: start = now - 365L*24*60*60*1000; break;
+            case WEEK: start = now - 7L*24*60*60*1000; numBuckets = 7; break;
+            case MONTH: start = now - 30L*24*60*60*1000; numBuckets = 4; break; // 4 semanas
+            case YEAR: default: start = now - 365L*24*60*60*1000; numBuckets = 12; break;
         }
         NumberFormat currency = NumberFormat.getCurrencyInstance(new Locale("pt","BR"));
         List<Order> orders = repo.all();
         double total = 0.0; int entregues = 0; int pendentes = 0; Set<Long> clientesSet = new HashSet<>();
+        WineDao wineDao = new WineDaoImpl(AppDatabase.getInstance(this));
+        // --- Gráfico ---
+        float[] salesBuckets = new float[numBuckets];
+        String[] labels = new String[numBuckets];
+        if (currentPeriod == Period.YEAR) {
+            String[] meses = {"Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"};
+            for (int i = 0; i < numBuckets; i++) labels[i] = meses[i];
+        } else if (currentPeriod == Period.MONTH) {
+            for (int i = 0; i < numBuckets; i++) labels[i] = "Semana " + (i+1);
+        } else {
+            for (int i = 0; i < numBuckets; i++) labels[i] = "Dia " + (i+1);
+        }
         for (Order o : orders) {
             if (o == null || o.getDateEpochMillis() == null) continue;
             long d = o.getDateEpochMillis(); if (d < start || d > now) continue;
             if ("DELIVERED".equalsIgnoreCase(o.getStatus())) entregues++; else if ("PENDING".equalsIgnoreCase(o.getStatus())) pendentes++;
             if (o.getClientId() != null) clientesSet.add(o.getClientId());
             boolean paid = "PAID".equalsIgnoreCase(o.getPayment());
-            if (paid && o.getItems() != null) for (OrderItem it : o.getItems()) if (it != null && it.getWine() != null && it.getWine().getPrice() != null && it.getQuantity() != null) total += it.getWine().getPrice() * it.getQuantity();
+            if (paid && o.getItems() != null) {
+                int bucketIdx = 0;
+                if (currentPeriod == Period.WEEK) bucketIdx = (int)((d - start) / (24*60*60*1000));
+                else if (currentPeriod == Period.MONTH) bucketIdx = (int)((d - start) / (7L*24*60*60*1000)); // semana do mês
+                else bucketIdx = (int)((d - start) / (30L*24*60*60*1000));
+                if (bucketIdx < 0) bucketIdx = 0; if (bucketIdx >= numBuckets) bucketIdx = numBuckets-1;
+                for (OrderItem it : o.getItems()) {
+                    if (it != null && it.getQuantity() != null) {
+                        Double price = null;
+                        if (it.getWine() != null && it.getWine().getPrice() != null) {
+                            price = it.getWine().getPrice();
+                        } else if (it.getWineId() != null) {
+                            Wine w = wineDao.findById(it.getWineId());
+                            if (w != null && w.getPrice() != null) price = w.getPrice();
+                        }
+                        if (price != null) {
+                            total += price * it.getQuantity();
+                            salesBuckets[bucketIdx] += price * it.getQuantity();
+                        }
+                    }
+                }
+            }
         }
+        // Atualiza gráfico
+        BarChart barChart = findViewById(R.id.barChart);
+        List<BarEntry> entries = new ArrayList<>();
+        for (int i = 0; i < numBuckets; i++) {
+            entries.add(new BarEntry(i, salesBuckets[i]));
+        }
+        BarDataSet dataSet = new BarDataSet(entries, "Vendas");
+        dataSet.setColor(0xFFF57C00);
+        dataSet.setValueTextColor(0xFFFFFFFF);
+        dataSet.setValueTextSize(14f);
+        BarData barData = new BarData(dataSet);
+        barData.setValueTextColor(0xFFFFFFFF);
+        barData.setValueTextSize(14f);
+        barChart.setData(barData);
+        barChart.getDescription().setEnabled(false);
+        barChart.getLegend().setTextColor(0xFFFFFFFF);
+        barChart.getLegend().setTextSize(14f);
+        barChart.setExtraBottomOffset(16f);
+        XAxis xAxis = barChart.getXAxis();
+        xAxis.setTextColor(0xFFFFFFFF);
+        xAxis.setTextSize(13f);
+        xAxis.setDrawGridLines(false);
+        xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
+        xAxis.setGranularity(1f);
+        xAxis.setLabelCount(numBuckets);
+        xAxis.setLabelRotationAngle(45f);
+        xAxis.setValueFormatter(new ValueFormatter() {
+            @Override
+            public String getFormattedValue(float value) {
+                int idx = (int) value;
+                if (idx >= 0 && idx < labels.length) return labels[idx];
+                return "";
+            }
+        });
+        YAxis yAxisLeft = barChart.getAxisLeft();
+        yAxisLeft.setTextColor(0xFFFFFFFF);
+        yAxisLeft.setTextSize(13f);
+        yAxisLeft.setDrawGridLines(true);
+        yAxisLeft.setValueFormatter(new ValueFormatter() {
+            @Override
+            public String getFormattedValue(float value) {
+                if (value == 0f) return "";
+                return currency.format(value);
+            }
+        });
+        YAxis yAxisRight = barChart.getAxisRight();
+        yAxisRight.setEnabled(false);
+        barChart.invalidate();
+
         int clientesVisitados = clientesSet.size();
         TextView tvTotalValue = findViewById(R.id.tvTotalValue);
         TextView tvTotalDelta = findViewById(R.id.tvTotalDelta);

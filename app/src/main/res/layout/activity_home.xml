@@ -291,6 +291,14 @@
 
             </androidx.cardview.widget.CardView>
 
+            <!-- Gráfico de vendas/lucro -->
+            <com.github.mikephil.charting.charts.BarChart
+                android:id="@+id/barChart"
+                android:layout_width="match_parent"
+                android:layout_height="240dp"
+                android:layout_marginTop="16dp"
+                android:background="#181818" />
+
         </LinearLayout>
 
     </androidx.core.widget.NestedScrollView>
