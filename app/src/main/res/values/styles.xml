@@ -1,0 +1,7 @@
+<resources>
+    <style name="SpinnerWhiteText" parent="Widget.AppCompat.Spinner">
+        <item name="android:textColor">#FFFFFF</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+</resources>
+

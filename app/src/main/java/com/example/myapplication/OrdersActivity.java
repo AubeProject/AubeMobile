@@ -64,6 +64,7 @@ public class OrdersActivity extends AppCompatActivity {
 
     private String[] getStatusLabels() {
         return new String[]{
+                getString(R.string.payment_all), // 'Todos' para status
                 getString(R.string.status_pending),
                 getString(R.string.status_delivered),
                 getString(R.string.status_cancelled),
@@ -79,7 +80,7 @@ public class OrdersActivity extends AppCompatActivity {
     }
 
     private String getStatusCodeByLabel(String label) {
-        if (label == null) return STATUS_PENDING;
+        if (label == null || label.equals(getString(R.string.payment_all))) return "";
         if (label.equals(getString(R.string.status_delivered))) return STATUS_DELIVERED;
         if (label.equals(getString(R.string.status_cancelled))) return STATUS_CANCELLED;
         if (label.equals(getString(R.string.status_draft))) return STATUS_DRAFT;
@@ -89,6 +90,23 @@ public class OrdersActivity extends AppCompatActivity {
         return STATUS_PENDING;
     }
 
+    private Spinner spinnerStatusFilter;
+    private Spinner spinnerPaymentFilter;
+    private String selectedStatusFilter = "";
+    private String selectedPaymentFilter = "";
+    private static final String PAYMENT_PAID = "PAID";
+    private static final String PAYMENT_PENDING = "PENDING";
+    private static final String PAYMENT_ALL = "";
+
+    private String[] getPaymentLabels() {
+        return new String[]{getString(R.string.payment_all), getString(R.string.payment_paid), getString(R.string.payment_pending)};
+    }
+    private String getPaymentCodeByLabel(String label) {
+        if (label == null || label.equals(getString(R.string.payment_all))) return PAYMENT_ALL;
+        if (label.equals(getString(R.string.payment_paid))) return PAYMENT_PAID;
+        if (label.equals(getString(R.string.payment_pending))) return PAYMENT_PENDING;
+        return PAYMENT_ALL;
+    }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -135,6 +153,31 @@ public class OrdersActivity extends AppCompatActivity {
 
         btnAdd.setOnClickListener(v -> openCreateOrderDialog(null));
 
+        spinnerStatusFilter = findViewById(R.id.spinnerStatusFilter);
+        spinnerPaymentFilter = findViewById(R.id.spinnerPaymentFilter);
+        ArrayAdapter<String> statusAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, getStatusLabels());
+        statusAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinnerStatusFilter.setAdapter(statusAdapter);
+        spinnerStatusFilter.setSelection(0);
+        ArrayAdapter<String> paymentAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, getPaymentLabels());
+        paymentAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinnerPaymentFilter.setAdapter(paymentAdapter);
+        spinnerPaymentFilter.setSelection(0);
+        spinnerStatusFilter.setOnItemSelectedListener(new android.widget.AdapterView.OnItemSelectedListener() {
+            @Override public void onItemSelected(android.widget.AdapterView<?> parent, View view, int position, long id) {
+                selectedStatusFilter = getStatusCodeByLabel((String) spinnerStatusFilter.getSelectedItem());
+                filter(etSearch.getText().toString());
+            }
+            @Override public void onNothingSelected(android.widget.AdapterView<?> parent) {}
+        });
+        spinnerPaymentFilter.setOnItemSelectedListener(new android.widget.AdapterView.OnItemSelectedListener() {
+            @Override public void onItemSelected(android.widget.AdapterView<?> parent, View view, int position, long id) {
+                selectedPaymentFilter = getPaymentCodeByLabel((String) spinnerPaymentFilter.getSelectedItem());
+                filter(etSearch.getText().toString());
+            }
+            @Override public void onNothingSelected(android.widget.AdapterView<?> parent) {}
+        });
+
         loadOrdersFromDb();
         if (savedInstanceState == null) {
             if (getIntent() != null && getIntent().hasExtra(EXTRA_PRESELECTED_WINE_ID)) {
@@ -168,8 +211,10 @@ public class OrdersActivity extends AppCompatActivity {
                 if (c != null && c.getName() != null) clientName = c.getName();
             }
             boolean matchClient = clientName != null && clientName.toLowerCase().contains(query);
-            boolean matchStatus = o.getStatus() != null && getStatusLabelByCode(o.getStatus()).toLowerCase().contains(query);
-            if (query.isEmpty() || matchClient || matchStatus) filtered.add(o);
+            boolean matchStatus = selectedStatusFilter.isEmpty() || (o.getStatus() != null && o.getStatus().equals(selectedStatusFilter));
+            boolean matchPayment = selectedPaymentFilter.isEmpty() || (o.getPayment() != null && o.getPayment().equalsIgnoreCase(selectedPaymentFilter));
+            boolean matchSearch = query.isEmpty() || matchClient || getStatusLabelByCode(o.getStatus()).toLowerCase().contains(query);
+            if (matchStatus && matchPayment && matchSearch) filtered.add(o);
         }
         adapter.setData(filtered);
     }
