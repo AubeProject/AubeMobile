@@ -118,7 +118,7 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <!-- Row 1: Total Vendido (left) and Clientes Visitados (right) -->
+            <!-- Top row metrics: Clientes Visitados & Pedidos Fechados -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -130,63 +130,8 @@
                     android:layout_weight="1"
                     android:layout_marginEnd="8dp"
                     app:cardCornerRadius="12dp"
-                    app:cardUseCompatPadding="true"
-                    app:cardBackgroundColor="#121212">
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:padding="16dp">
-
-                        <ImageView
-                            android:id="@+id/iconTotal"
-                            android:layout_width="24dp"
-                            android:layout_height="24dp"
-                            android:src="@drawable/ic_currency_dollar"
-                            app:tint="#F57C00"
-                            android:contentDescription="@string/total_vendido"
-                            android:layout_marginBottom="8dp" />
-
-                        <TextView
-                            android:id="@+id/tvTotalLabel"
-                            android:text="@string/total_vendido"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:textColor="#BDBDBD"
-                            android:textSize="14sp" />
-
-                        <TextView
-                            android:id="@+id/tvTotalValue"
-                            android:text="@string/valor_total"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:textColor="#FFFFFF"
-                            android:textSize="20sp"
-                            android:textStyle="bold"
-                            android:layout_marginTop="6dp" />
-
-                        <TextView
-                            android:id="@+id/tvTotalDelta"
-                            android:text="@string/delta_mes_anterior"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:textColor="#B0B0B0"
-                            android:textSize="12sp"
-                            android:layout_marginTop="6dp" />
-
-                    </LinearLayout>
-
-                </androidx.cardview.widget.CardView>
-
-                <androidx.cardview.widget.CardView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:layout_marginStart="8dp"
-                    app:cardCornerRadius="12dp"
-                    app:cardUseCompatPadding="true"
-                    app:cardBackgroundColor="#121212">
+                    app:cardBackgroundColor="#121212"
+                    app:cardUseCompatPadding="true">
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -204,25 +149,28 @@
                             android:layout_marginBottom="8dp" />
 
                         <TextView
-                            android:text="@string/clientes_visitados"
+                            android:id="@+id/tvClientesLabel"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:text="@string/clientes_visitados"
                             android:textColor="#BDBDBD"
                             android:textSize="12sp" />
 
                         <TextView
-                            android:text="@string/valor_clientes"
+                            android:id="@+id/tvClientesValue"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:text="0"
                             android:textColor="#FFFFFF"
                             android:textSize="18sp"
                             android:textStyle="bold"
                             android:layout_marginTop="6dp" />
 
                         <TextView
-                            android:text="@string/clientes_semana"
+                            android:id="@+id/tvClientesDelta"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:text=""
                             android:textColor="#49C46A"
                             android:textSize="12sp"
                             android:layout_marginTop="6dp" />
@@ -231,23 +179,14 @@
 
                 </androidx.cardview.widget.CardView>
 
-            </LinearLayout>
-
-            <!-- Row 2: Pedidos Fechados (left) and Comissões (right) -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:layout_marginTop="12dp">
-
                 <androidx.cardview.widget.CardView
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:layout_marginEnd="8dp"
+                    android:layout_marginStart="8dp"
                     app:cardCornerRadius="12dp"
-                    app:cardUseCompatPadding="true"
-                    app:cardBackgroundColor="#121212">
+                    app:cardBackgroundColor="#121212"
+                    app:cardUseCompatPadding="true">
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -265,78 +204,29 @@
                             android:layout_marginBottom="8dp" />
 
                         <TextView
-                            android:text="@string/pedidos_fechados"
+                            android:id="@+id/tvPedidosLabel"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:text="@string/pedidos_fechados"
                             android:textColor="#BDBDBD"
                             android:textSize="14sp" />
 
                         <TextView
-                            android:text="@string/valor_pedidos"
+                            android:id="@+id/tvPedidosValue"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:text="0"
                             android:textColor="#FFFFFF"
                             android:textSize="18sp"
                             android:textStyle="bold"
                             android:layout_marginTop="6dp" />
 
                         <TextView
-                            android:text="@string/pendentes"
+                            android:id="@+id/tvPedidosPendentes"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:text=""
                             android:textColor="#F57C00"
-                            android:textSize="12sp"
-                            android:layout_marginTop="6dp" />
-
-                    </LinearLayout>
-
-                </androidx.cardview.widget.CardView>
-
-                <androidx.cardview.widget.CardView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:layout_marginStart="8dp"
-                    app:cardCornerRadius="12dp"
-                    app:cardUseCompatPadding="true"
-                    app:cardBackgroundColor="#121212">
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:padding="16dp">
-
-                        <ImageView
-                            android:id="@+id/iconComissoes"
-                            android:layout_width="24dp"
-                            android:layout_height="24dp"
-                            android:src="@drawable/ic_filter_circle"
-                            app:tint="#F57C00"
-                            android:contentDescription="@string/comissoes"
-                            android:layout_marginBottom="8dp" />
-
-                        <TextView
-                            android:text="@string/comissoes"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:textColor="#BDBDBD"
-                            android:textSize="12sp" />
-
-                        <TextView
-                            android:text="@string/valor_comissoes"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:textColor="#FFFFFF"
-                            android:textSize="18sp"
-                            android:textStyle="bold"
-                            android:layout_marginTop="6dp" />
-
-                        <TextView
-                            android:text="@string/percent_comissoes"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:textColor="#BDBDBD"
                             android:textSize="12sp"
                             android:layout_marginTop="6dp" />
 
@@ -346,35 +236,56 @@
 
             </LinearLayout>
 
-            <!-- Chart card -->
+            <!-- Full width Total Vendido card -->
             <androidx.cardview.widget.CardView
                 android:layout_width="match_parent"
-                android:layout_height="200dp"
-                android:layout_marginTop="16dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
                 app:cardCornerRadius="12dp"
-                app:cardUseCompatPadding="true"
-                app:cardBackgroundColor="#121212">
+                app:cardBackgroundColor="#121212"
+                app:cardUseCompatPadding="true">
 
                 <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
+                    android:layout_height="wrap_content"
                     android:orientation="vertical"
                     android:padding="16dp">
 
+                    <ImageView
+                        android:id="@+id/iconTotal"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:src="@drawable/ic_currency_dollar"
+                        app:tint="#F57C00"
+                        android:contentDescription="@string/total_vendido"
+                        android:layout_marginBottom="8dp" />
+
                     <TextView
-                        android:text="@string/vendas_ultimos_meses"
+                        android:id="@+id/tvTotalLabel"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:textColor="#FFFFFF"
+                        android:text="@string/total_vendido"
+                        android:textColor="#BDBDBD"
                         android:textSize="14sp" />
 
-                    <!-- Placeholder for chart -->
-                    <View
-                        android:layout_width="match_parent"
-                        android:layout_height="0dp"
-                        android:layout_weight="1"
-                        android:layout_marginTop="12dp"
-                        android:background="#2E2E2E" />
+                    <TextView
+                        android:id="@+id/tvTotalValue"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="R$ 0,00"
+                        android:textColor="#FFFFFF"
+                        android:textSize="20sp"
+                        android:textStyle="bold"
+                        android:layout_marginTop="6dp" />
+
+                    <TextView
+                        android:id="@+id/tvTotalDelta"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text=""
+                        android:textColor="#B0B0B0"
+                        android:textSize="12sp"
+                        android:layout_marginTop="6dp" />
 
                 </LinearLayout>
 

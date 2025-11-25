@@ -195,7 +195,7 @@ public class OrdersActivity extends AppCompatActivity {
         clientAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spClient.setAdapter(clientAdapter);
 
-        ArrayAdapter<String> paymentAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, new String[]{"Cartão de Crédito", "Boleto", "Pix", "Dinheiro"});
+        ArrayAdapter<String> paymentAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, new String[]{"Pagamento Pendente", "Pagamento Feito"});
         paymentAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spPayment.setAdapter(paymentAdapter);
 
@@ -236,16 +236,32 @@ public class OrdersActivity extends AppCompatActivity {
                 }
             }
             Client selectedClient = clients.get(clientIndex);
-            String paymentMethod = (String) spPayment.getSelectedItem();
-            String statusCode = getStatusCodeByLabel((String) spStatus.getSelectedItem());
+            // Payment state
+            String paymentStateLabel = (String) spPayment.getSelectedItem();
+            String paymentStateCode = "PENDING";
+            if ("Pagamento Feito".equals(paymentStateLabel)) paymentStateCode = "PAID";
+            // Status code from spinner
+            String statusLabel = (String) spStatus.getSelectedItem();
+            String statusCode = getStatusCodeByLabel(statusLabel);
             Order newOrder = new Order();
             newOrder.setNumber(orderRepo.nextNumber());
             newOrder.setClientId(selectedClient.getId());
             newOrder.setStatus(statusCode);
-            newOrder.setPayment(paymentMethod);
+            newOrder.setPayment(paymentStateCode);
             newOrder.setDateEpochMillis(System.currentTimeMillis());
             newOrder.setItems(items);
             orderRepo.add(newOrder);
+            // Deduz estoque se entregue
+            if (STATUS_DELIVERED.equals(newOrder.getStatus())) {
+                for (OrderItem oi : items) {
+                    Wine w = oi.getWine();
+                    if (w != null && w.getQuantity() != null) {
+                        int newQty = Math.max(0, w.getQuantity() - oi.getQuantity());
+                        w.setQuantity(newQty);
+                        wineDao.update(w);
+                    }
+                }
+            }
             loadOrdersFromDb();
             dialog.dismiss();
         });
@@ -351,6 +367,23 @@ public class OrdersActivity extends AppCompatActivity {
         return arr;
     }
 
+    private double calcTotal(Order o) {
+        double sum = 0.0;
+        if (o == null || o.getItems() == null) return 0.0;
+        for (OrderItem it : o.getItems()) {
+            if (it == null) continue;
+            Wine w = it.getWine();
+            if ((w == null || w.getPrice() == null) && it.getWineId() != null) {
+                // fallback: fetch wine from DB
+                try { w = wineDao.findById(it.getWineId()); } catch (Exception ignored) {}
+            }
+            Double price = (w != null ? w.getPrice() : null);
+            Integer qty = it.getQuantity();
+            if (price != null && qty != null) sum += price * qty;
+        }
+        return sum;
+    }
+
     // --- Adapter ---
     class OrdersAdapter extends RecyclerView.Adapter<OrdersAdapter.VH> {
         private final List<Order> visible = new ArrayList<>();
@@ -373,9 +406,9 @@ public class OrdersActivity extends AppCompatActivity {
             ((TextView) h.itemView.findViewById(R.id.tvOrderClient)).setText(clientText);
             SimpleDateFormat df = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
             ((TextView) h.itemView.findViewById(R.id.tvOrderDate)).setText(df.format(new Date(o.getDateEpochMillis())));
-            ((TextView) h.itemView.findViewById(R.id.tvOrderItems)).setText(o.itemCount() + getString(R.string.items_suffix));
+            ((TextView) h.itemView.findViewById(R.id.tvOrderItems)).setText(getString(R.string.order_items_count_format, o.itemCount()));
             NumberFormat nf = NumberFormat.getCurrencyInstance(new Locale("pt", "BR"));
-            ((TextView) h.itemView.findViewById(R.id.tvOrderTotalPrice)).setText(nf.format(o.total()));
+            ((TextView) h.itemView.findViewById(R.id.tvOrderTotalPrice)).setText(nf.format(calcTotal(o)));
             h.itemView.setOnClickListener(v -> openOrderDetailDialog(o));
         }
         @Override public int getItemCount() { return visible.size(); }
@@ -401,7 +434,7 @@ public class OrdersActivity extends AppCompatActivity {
         ((TextView) view.findViewById(R.id.tvDetailDate)).setText(df.format(new Date(finalOrder.getDateEpochMillis())));
         ((TextView) view.findViewById(R.id.tvDetailStatus)).setText(getStatusLabelByCode(finalOrder.getStatus()));
         NumberFormat nf = NumberFormat.getCurrencyInstance(new Locale("pt", "BR"));
-        ((TextView) view.findViewById(R.id.tvDetailTotal)).setText(nf.format(finalOrder.total()));
+        ((TextView) view.findViewById(R.id.tvDetailTotal)).setText(nf.format(calcTotal(finalOrder))); // use fallback total
         LinearLayout itemsContainer = view.findViewById(R.id.containerDetailItems);
         if (finalOrder.getItems() != null) {
             for (OrderItem it : finalOrder.getItems()) {
@@ -463,12 +496,14 @@ public class OrdersActivity extends AppCompatActivity {
         for (int i = 0; i < clients.size(); i++) {
             if (finalOrder.getClientId() != null && finalOrder.getClientId().equals(clients.get(i).getId())) { spClient.setSelection(i); break; }
         }
-        ArrayAdapter<String> paymentAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, new String[]{"Cartão de Crédito", "Boleto", "Pix", "Dinheiro"});
+        ArrayAdapter<String> paymentAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, new String[]{"Pagamento Pendente", "Pagamento Feito"});
         paymentAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spPayment.setAdapter(paymentAdapter);
         for (int i = 0; i < paymentAdapter.getCount(); i++) {
             String item = paymentAdapter.getItem(i);
-            if (item != null && item.equals(finalOrder.getPayment())) { spPayment.setSelection(i); break; }
+            String currentPaymentLabel = "Pagamento Pendente";
+            if ("PAID".equals(finalOrder.getPayment())) currentPaymentLabel = "Pagamento Feito";
+            if (item != null && item.equals(currentPaymentLabel)) { spPayment.setSelection(i); break; }
         }
 
         ArrayAdapter<String> statusAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, getStatusLabels());
@@ -480,17 +515,27 @@ public class OrdersActivity extends AppCompatActivity {
             if (lbl != null && lbl.equals(currentLabel)) { spStatus.setSelection(i); break; }
         }
 
-        // Mostra itens existentes (não editável simplificado)
-        if (finalOrder.getItems() != null) {
+        // Editable items: populate repeater rows from existing order items
+        List<Wine> allWines = wineDao.findAll();
+        if (finalOrder.getItems() != null && !finalOrder.getItems().isEmpty()) {
             for (OrderItem it : finalOrder.getItems()) {
-                TextView tv = new TextView(this);
-                String wineName = it.getWine() != null ? it.getWine().getName() : buscaWineNome(it.getWineId());
-                tv.setText(getString(R.string.order_item_line, wineName, it.getQuantity()));
-                tv.setPadding(0,8,0,8);
-                containerProducts.addView(tv);
+                addProductRow(containerProducts, it.getWineId());
+                // set quantity on the last added row
+                View row = containerProducts.getChildAt(containerProducts.getChildCount()-1);
+                if (row instanceof LinearLayout) {
+                    for (int j=0;j<((LinearLayout)row).getChildCount();j++) {
+                        View inner = ((LinearLayout)row).getChildAt(j);
+                        if (inner instanceof EditText) {
+                          ((EditText)inner).setText(String.valueOf(it.getQuantity() != null ? it.getQuantity() : 1));
+                        }
+                    }
+                }
             }
+        } else {
+            addProductRow(containerProducts, null);
         }
-        btnAddProductRow.setVisibility(View.GONE);
+        btnAddProductRow.setVisibility(View.VISIBLE);
+        btnAddProductRow.setOnClickListener(v -> addProductRow(containerProducts, null));
 
         AlertDialog dialog = new AlertDialog.Builder(this)
                 .setView(dialogView)
@@ -499,9 +544,28 @@ public class OrdersActivity extends AppCompatActivity {
         btnCreate.setOnClickListener(v -> {
             int clientIndex = spClient.getSelectedItemPosition();
             if (clientIndex >= 0 && clientIndex < clients.size()) finalOrder.setClientId(clients.get(clientIndex).getId());
-            finalOrder.setPayment((String) spPayment.getSelectedItem());
+            String previousStatus = finalOrder.getStatus();
+            String paymentStateLabel = (String) spPayment.getSelectedItem();
+            finalOrder.setPayment("Pagamento Feita".equals(paymentStateLabel) ? "PAID" : "PENDING");
             finalOrder.setStatus(getStatusCodeByLabel((String) spStatus.getSelectedItem()));
+            List<OrderItem> newItems = collectItemsPersistent(containerProducts);
+            if (newItems.isEmpty()) {
+                Toast.makeText(this, R.string.error_order_need_item, Toast.LENGTH_SHORT).show();
+                return;
+            }
+            finalOrder.setItems(newItems);
             orderRepo.update(finalOrder);
+            if (!STATUS_DELIVERED.equals(previousStatus) && STATUS_DELIVERED.equals(finalOrder.getStatus())) {
+                for (OrderItem oi : newItems) {
+                    Wine w = oi.getWine();
+                    if (w == null) { w = wineDao.findById(oi.getWineId()); }
+                    if (w != null && w.getQuantity() != null) {
+                        int newQty = Math.max(0, w.getQuantity() - oi.getQuantity());
+                        w.setQuantity(newQty);
+                        wineDao.update(w);
+                    }
+                }
+            }
             loadOrdersFromDb();
             dialog.dismiss();
         });

@@ -41,6 +41,9 @@
     <string name="valor_clientes">28</string>
     <string name="valor_pedidos">42</string>
     <string name="valor_comissoes">R$ 4.725</string>
+    <string name="dashboard_period_summary_format">Período • %1$d clientes • %2$d pedidos</string>
+    <string name="dashboard_pending_format">Pendentes: %1$d</string>
+    <string name="dashboard_orders_format">Entregues: %1$d</string>
 
     <!-- Bottom nav -->
     <string name="nav_dashboard">Dashboard</string>
