@@ -191,4 +191,10 @@
     <string name="payment_all">Todos</string>
     <string name="payment_paid">Pagamento Feito</string>
     <string name="payment_pending">Pagamento Pendente</string>
+
+    <!-- Routes -->
+    <string name="router_header_title"> Rotas </string>
+    <string name="router_header_subtitle"> clientes na rotas </string>
+    <string name="router_play"> Iniciar Rota </string>
+
 </resources>

@@ -6,7 +6,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 public class AppDatabase extends SQLiteOpenHelper {
     public static final String DATABASE_NAME = "app.db";
-    public static final int DATABASE_VERSION = 5; // bump for orders tables
+    public static final int DATABASE_VERSION = 6; // bump for companies table
 
     // User table
     public static final String TABLE_USERS = "users";
@@ -18,30 +18,30 @@ public class AppDatabase extends SQLiteOpenHelper {
     public static final String TABLE_WINES = "wines";
     public static final String COL_WINE_ID = "id";
     public static final String COL_WINE_NAME = "name";
-    public static final String COL_WINE_TYPE = "type"; // Tinto, Branco, Rosé, Espumante...
-    public static final String COL_WINE_YEAR = "year"; // safra
-    public static final String COL_WINE_PRICE = "price"; // REAL
-    public static final String COL_WINE_NOTES = "notes"; // notas de degustação
-    public static final String COL_WINE_PAIRING = "pairing"; // harmonização
-    public static final String COL_WINE_IMAGE_URI = "image_uri"; // URI da imagem no device
+    public static final String COL_WINE_TYPE = "type"; 
+    public static final String COL_WINE_YEAR = "year"; 
+    public static final String COL_WINE_PRICE = "price"; 
+    public static final String COL_WINE_NOTES = "notes"; 
+    public static final String COL_WINE_PAIRING = "pairing"; 
+    public static final String COL_WINE_IMAGE_URI = "image_uri"; 
     public static final String COL_WINE_QUANTITY = "quantity";
 
     // Clients table
     public static final String TABLE_CLIENTS = "clients";
     public static final String COL_CLIENT_ID = "id";
-    public static final String COL_CLIENT_NAME = "name";        // nome/razão
-    public static final String COL_CLIENT_DOCUMENT = "document"; // cpf/cnpj
-    public static final String COL_CLIENT_ADDRESS = "address";   // endereço/localização
-    public static final String COL_CLIENT_RESPONSIBLE = "responsible"; // responsável
-    public static final String COL_CLIENT_PHONE = "phone";       // telefone
+    public static final String COL_CLIENT_NAME = "name";
+    public static final String COL_CLIENT_DOCUMENT = "document";
+    public static final String COL_CLIENT_ADDRESS = "address";
+    public static final String COL_CLIENT_RESPONSIBLE = "responsible";
+    public static final String COL_CLIENT_PHONE = "phone";
 
     // Orders table
     public static final String TABLE_ORDERS = "orders";
     public static final String COL_ORDER_ID = "id";
     public static final String COL_ORDER_NUMBER = "number";
     public static final String COL_ORDER_CLIENT_ID = "client_id";
-    public static final String COL_ORDER_DATE = "date"; // epoch millis
-    public static final String COL_ORDER_STATUS = "status"; // PENDING, DELIVERED...
+    public static final String COL_ORDER_DATE = "date"; 
+    public static final String COL_ORDER_STATUS = "status"; 
     public static final String COL_ORDER_PAYMENT = "payment";
 
     public static final String TABLE_ORDER_ITEMS = "order_items";
@@ -49,6 +49,14 @@ public class AppDatabase extends SQLiteOpenHelper {
     public static final String COL_ORDER_ITEM_ORDER_ID = "order_id";
     public static final String COL_ORDER_ITEM_WINE_ID = "wine_id";
     public static final String COL_ORDER_ITEM_QTY = "quantity";
+
+    // Companies table
+    public static final String TABLE_COMPANIES = "companies";
+    public static final String COL_COMPANY_ID = "id";
+    public static final String COL_COMPANY_NAME = "name";
+    public static final String COL_COMPANY_ADDRESS = "address";
+    public static final String COL_COMPANY_LATITUDE = "latitude";
+    public static final String COL_COMPANY_LONGITUDE = "longitude";
 
     private static volatile AppDatabase INSTANCE; // singleton
 
@@ -109,6 +117,7 @@ public class AppDatabase extends SQLiteOpenHelper {
                 "FOREIGN KEY(" + COL_ORDER_CLIENT_ID + ") REFERENCES " + TABLE_CLIENTS + "(" + COL_CLIENT_ID + ")" +
                 ");";
         db.execSQL(CREATE_ORDERS);
+
         String CREATE_ORDER_ITEMS = "CREATE TABLE IF NOT EXISTS " + TABLE_ORDER_ITEMS + " (" +
                 COL_ORDER_ITEM_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
                 COL_ORDER_ITEM_ORDER_ID + " INTEGER NOT NULL, " +
@@ -118,6 +127,15 @@ public class AppDatabase extends SQLiteOpenHelper {
                 "FOREIGN KEY(" + COL_ORDER_ITEM_WINE_ID + ") REFERENCES " + TABLE_WINES + "(" + COL_WINE_ID + ")" +
                 ");";
         db.execSQL(CREATE_ORDER_ITEMS);
+
+        String CREATE_COMPANIES = "CREATE TABLE IF NOT EXISTS " + TABLE_COMPANIES + " (" +
+                COL_COMPANY_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                COL_COMPANY_NAME + " TEXT, " +
+                COL_COMPANY_ADDRESS + " TEXT, " +
+                COL_COMPANY_LATITUDE + " REAL, " +
+                COL_COMPANY_LONGITUDE + " REAL" +
+                ");";
+        db.execSQL(CREATE_COMPANIES);
     }
 
     @Override
@@ -156,6 +174,16 @@ public class AppDatabase extends SQLiteOpenHelper {
                     "FOREIGN KEY(" + COL_ORDER_ITEM_WINE_ID + ") REFERENCES " + TABLE_WINES + "(" + COL_WINE_ID + ")" +
                     ");";
             db.execSQL(CREATE_ORDER_ITEMS);
+        }
+        if (oldVersion < 6) {
+            String CREATE_COMPANIES = "CREATE TABLE IF NOT EXISTS " + TABLE_COMPANIES + " (" +
+                    COL_COMPANY_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                    COL_COMPANY_NAME + " TEXT, " +
+                    COL_COMPANY_ADDRESS + " TEXT, " +
+                    COL_COMPANY_LATITUDE + " REAL, " +
+                    COL_COMPANY_LONGITUDE + " REAL" +
+                    ");";
+            db.execSQL(CREATE_COMPANIES);
         }
     }
 }
